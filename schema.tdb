@@ -1,0 +1,29 @@
+$TABLE user {
+  id        Int    key(primary)
+  name      String unqiue(true)
+  password  String
+  email     String unqiue(true)
+  level     Float
+  DOB       Date   optional(true)
+  post_id   String unique(true)
+  createdAt Date   default(now)
+}
+
+$TABLE post {
+  id        Int     key(primary)
+  user_id   String  relation(user.post_id)
+  title     String
+  content   String
+  pictures  Vector  vector(String) optional(true)
+  reply_id  String  unqiue(true)
+  createdAt Date   default(now)
+}
+
+$TABLE reply {
+  id        Int     key(primary)
+  user_id   String  relation(user.post_id)
+  content   String
+  post_id   String  optional(true) relation(post.reply_id)
+  reply_id  String  optional(true) relation(reply.reply_id)
+  createdAt Date   default(now)
+}
