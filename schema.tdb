@@ -1,31 +1,35 @@
 $TABLE user {
-  id              Int    key(primary)
-  name            String unqiue(true)
-  password        String
-  email           String unqiue(true) optional(true)
-  level           Float
-  bio             String optional(true)
-  display_picture String optional(true)
-  DOB             Date   optional(true)
-  post_id         String unique(true)
-  createdAt       Date   default(now)
+  id                Int    key(primary)
+  name              String unqiue(true)
+  password          String
+  email             String unqiue(true) optional(true)
+  level             Float
+  bio               String optional(true)
+  display_picture   String optional(true)
+  DOB               Date   optional(true)
+  // user's unique identifier
+  post_id           String unique(true)
+  created_at        Date   default(now)
 }
 
 $TABLE post {
-  id        Int     key(primary)
-  user_id   String  relation(user.post_id)
-  title     String
-  content   String
-  pictures  Vector  vector(String) optional(true)
-  reply_id  String  unqiue(true)
-  createdAt Date   default(now)
+  id          Int     key(primary)
+  user_id     String  relation(user.post_id)
+  title       String
+  content     String
+  pictures    Vector  vector(String) optional(true)
+  reply_id    String  unqiue(true)
+  created_at  Date   default(now)
 }
 
 $TABLE reply {
-  id        Int     key(primary)
-  user_id   String  relation(user.post_id)
-  content   String
-  post_id   String  optional(true) relation(post.reply_id)
-  reply_id  String  optional(true) relation(reply.reply_id)
-  createdAt Date   default(now)
+  id          Int     key(primary)
+  user_id     String  relation(user.post_id)
+  content     String
+  // the root post_id
+  post_id     String  relation(post.reply_id)
+  // the id either the root post or the parent reply
+  parent_id   String  relation(reply.reply_id)
+  reply_id    String  unique(true)
+  created_at  Date   default(now)
 }

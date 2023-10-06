@@ -12,7 +12,7 @@ type DB = {
     display_picture?: string;
     DOB?: Date;
     post_id: Unique<string>;
-    createdAt: Default<Date>;
+    created_at: Default<Date>;
   };
 
   post: {
@@ -22,16 +22,17 @@ type DB = {
     content: string;
     pictures?: string[];
     reply_id: Unique<string>;
-    createdAt: Default<Date>;
+    created_at: Default<Date>;
   };
 
   reply: {
     id: PrimaryKey<number>;
     user_id: string;
-    contend: string;
-    post_id?: string;
-    reply_id?: string;
-    createdAt: Default<Date>;
+    content: string;
+    post_id: string;
+    parent_id: string;
+    reply_id: Unique<string>;
+    created_at: Default<Date>;
   };
 };
 
