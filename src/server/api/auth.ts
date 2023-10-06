@@ -15,7 +15,7 @@ export const Encrypt = {
   hash: (value: string) => {
     return b.hashSync(value, 10);
   },
-  compare: (value: string, hash: string) => {
-    return b.compareSync(value, hash);
+  compare: (plain: string, hashed: string) => {
+    return b.compareSync(plain, hashed);
   },
 };

@@ -77,6 +77,17 @@ const t = initTRPC.context<typeof createTRPCContext>().create({
  */
 export const createTRPCRouter = t.router;
 
+const optionalAuth = t.middleware(({ next, ctx }) => {
+  if (ctx.auth.token) {
+    try {
+      const post_id = AppToken.validate(ctx.auth.token);
+      return next({ ctx: { auth: { ...ctx.auth, post_id } } });
+    } catch (e) {
+      ctx.log.error(e, "invalid token, but allowed");
+    }
+  }
+  return next({ ctx: { auth: { ...ctx.auth } } });
+});
 /**
  * Public (unauthenticated) procedure
  *
@@ -84,7 +95,7 @@ export const createTRPCRouter = t.router;
  * guarantee that a user querying is authorized, but you can still access user session data if they
  * are logged in.
  */
-export const publicProcedure = t.procedure;
+export const publicProcedure = t.procedure.use(optionalAuth);
 
 const isAuthed = t.middleware(({ next, ctx }) => {
   if (!ctx.auth.token) {

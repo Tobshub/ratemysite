@@ -1,4 +1,4 @@
-import Tobsdb, { PrimaryKey, Unique } from "tobsdb";
+import Tobsdb, { PrimaryKey, Unique, Default } from "tobsdb";
 import { env } from "@/env.mjs";
 
 type DB = {
@@ -6,11 +6,13 @@ type DB = {
     id: PrimaryKey<number>;
     name: Unique<string>;
     password: string;
-    email: Unique<string>;
+    email?: Unique<string>;
     level: number;
+    bio?: string;
+    display_picture?: string;
     DOB?: Date;
     post_id: Unique<string>;
-    createdAt: Date;
+    createdAt: Default<Date>;
   };
 
   post: {
@@ -20,7 +22,7 @@ type DB = {
     content: string;
     pictures?: string[];
     reply_id: Unique<string>;
-    createdAt: Date;
+    createdAt: Default<Date>;
   };
 
   reply: {
@@ -29,7 +31,7 @@ type DB = {
     contend: string;
     post_id?: string;
     reply_id?: string;
-    createdAt: Date;
+    createdAt: Default<Date>;
   };
 };
 

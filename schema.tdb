@@ -1,12 +1,14 @@
 $TABLE user {
-  id        Int    key(primary)
-  name      String unqiue(true)
-  password  String
-  email     String unqiue(true)
-  level     Float
-  DOB       Date   optional(true)
-  post_id   String unique(true)
-  createdAt Date   default(now)
+  id              Int    key(primary)
+  name            String unqiue(true)
+  password        String
+  email           String unqiue(true) optional(true)
+  level           Float
+  bio             String optional(true)
+  display_picture String optional(true)
+  DOB             Date   optional(true)
+  post_id         String unique(true)
+  createdAt       Date   default(now)
 }
 
 $TABLE post {
