@@ -21,14 +21,41 @@ export const PostRouter = createTRPCRouter({
         });
       }
 
-      return res.data.map((post) => ({
-        title: post.title,
-        content: post.content,
-        pictures: post.pictures,
-        reply_id: post.reply_id,
-        created_at: post.created_at,
-      }));
+      const posts = [];
+      for (const post of res.data) {
+        const user = await ctx.db.findUnique("user", {
+          post_id: post.user_id,
+        });
+
+        if (!user.data || user.status !== 200) {
+          // for some reason I don't want to error on 404
+          if (user.status === 404) {
+            ctx.log.error(user, "Could not find post author");
+          } else {
+            ctx.log.error(user, "Error fetching post author");
+            throw new TRPCError({
+              code: "INTERNAL_SERVER_ERROR",
+              message: "Something went wrong!",
+            });
+          }
+        }
+
+        posts.push({
+          title: post.title,
+          content: post.content,
+          pictures: post.pictures,
+          reply_id: post.reply_id,
+          created_at: post.created_at,
+          author: {
+            name: user.data.name,
+            display_picture: user.data.display_picture,
+          },
+        });
+      }
+
+      return posts;
     }),
+  // TODO: fix to include replies
   get: publicProcedure.input(z.string()).query(async ({ input, ctx }) => {
     const res = await ctx.db.findUnique("post", { reply_id: input });
 
@@ -47,12 +74,28 @@ export const PostRouter = createTRPCRouter({
       });
     }
 
+    const post_author = await ctx.db.findUnique("user", {
+      post_id: res.data.user_id,
+    });
+
+    if (post_author.status !== 200 || !post_author.data) {
+      ctx.log.error(post_author, "Error fetching post auther");
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: "Something went wrong!",
+      });
+    }
+
     return {
       title: res.data.title,
       content: res.data.content,
       pictures: res.data.pictures,
       reply_id: res.data.reply_id,
       created_at: res.data.created_at,
+      author: {
+        name: post_author.data.name,
+        display_picture: post_author.data.display_picture,
+      },
     };
   }),
   new: privateProcedure
