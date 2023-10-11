@@ -38,7 +38,9 @@ const createInnerTRPCContext = (_opts: CreateContextOptions) => {
  */
 export const createTRPCContext = (_opts: CreateNextContextOptions) => {
   const token = _opts.req.headers.authorization;
-  return createInnerTRPCContext({ token });
+  return createInnerTRPCContext({
+    token: token === "undefined" ? undefined : token,
+  });
 };
 
 /**
