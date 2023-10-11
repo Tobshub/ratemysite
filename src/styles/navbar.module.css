@@ -1,0 +1,13 @@
+.navbar_sm {
+  display: none;
+}
+
+@media (max-width: 750px) {
+  .navbar_reg {
+    display: none;
+  }
+
+  .navbar_sm {
+    display: block;
+  }
+}
