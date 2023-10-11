@@ -116,7 +116,7 @@ export const PostRouter = createTRPCRouter({
         reply_id,
       });
 
-      if (!res.data || res.status !== 200) {
+      if (!res.data || res.status !== 201) {
         ctx.log.error(res, "Error creating post");
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
