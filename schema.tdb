@@ -1,8 +1,8 @@
 $TABLE user {
   id                Int    key(primary)
-  name              String unqiue(true)
+  name              String unique(true)
   password          String
-  email             String unqiue(true) optional(true)
+  email             String unique(true) optional(true)
   level             Float
   bio               String optional(true)
   display_picture   String optional(true)
@@ -18,8 +18,8 @@ $TABLE post {
   title       String
   content     String
   pictures    Vector  vector(String) optional(true)
-  reply_id    String  unqiue(true)
-  created_at  Date   default(now)
+  reply_id    String  unique(true)
+  created_at  Date    default(now)
 }
 
 $TABLE reply {
@@ -31,5 +31,5 @@ $TABLE reply {
   // the id either the root post or the parent reply
   parent_id   String  relation(reply.reply_id)
   reply_id    String  unique(true)
-  created_at  Date   default(now)
+  created_at  Date    default(now)
 }
