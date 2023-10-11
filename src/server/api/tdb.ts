@@ -40,5 +40,5 @@ export const db = await Tobsdb.connect<DB>(
   env.TDB_HOST,
   env.TDB_TABLE,
   { auth: { username: env.TDB_USERNAME, password: env.TDB_PASSWORD } },
-  { log: true }
+  { log: env.NODE_ENV === "development" }
 );
