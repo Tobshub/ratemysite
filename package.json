@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "scripts": {
     "build": "next build",
-    "dev": "tdb -log -dbg -port 8085 & next dev",
+    "dev": "tdb -log -dbg -port 8085 & next dev | pino-pretty",
     "lint": "next lint",
     "start": "next start"
   },
@@ -11,6 +11,7 @@
     "@emotion/react": "^11.11.1",
     "@emotion/styled": "^11.11.0",
     "@fontsource/roboto": "^5.0.8",
+    "@mui/icons-material": "^5.14.12",
     "@mui/material": "^5.14.12",
     "@t3-oss/env-nextjs": "^0.6.0",
     "@tanstack/react-query": "^4.32.6",
