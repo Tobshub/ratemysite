@@ -7,6 +7,7 @@
   flex-direction: column;
   gap: 0.5rem;
   font-size: 18px;
+  margin-bottom: 0.5rem;
 
   .post_pic_container {
     display: flex;
