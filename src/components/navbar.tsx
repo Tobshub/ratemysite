@@ -1,6 +1,4 @@
-"use client";
-
-import { MouseEventHandler, PropsWithChildren, useState } from "react";
+import { PropsWithChildren, useState } from "react";
 import styles from "@/styles/navbar.module.css";
 import { PrimaryButton } from "./button";
 import { type NextRouter, useRouter } from "next/router";
@@ -11,7 +9,6 @@ import PersonIcon from "@mui/icons-material/Person";
 import CreateIcon from "@mui/icons-material/Create";
 import {
   Button,
-  IconButton,
   List,
   ListItemAvatar,
   ListItemButton,
@@ -154,16 +151,19 @@ function NavItem(
   } & PropsWithChildren
 ) {
   return (
-    <ListItemButton sx={{ display: "flex", gap: 1 }}>
-      <Link href={props.link}>
+    <Link
+      href={props.link}
+      style={{ color: "inherit", textDecoration: "none" }}
+    >
+      <ListItemButton sx={{ display: "flex", gap: 1, alignItems: "center" }}>
         <ListItemAvatar sx={{ minWidth: "fit-content" }}>
           {props.icon}
         </ListItemAvatar>
-        <ListItemText sx={{ fontSize: "1.25rem" }}>
+        <ListItemText primaryTypographyProps={{ fontSize: "1.25rem" }}>
           {props.children}
         </ListItemText>
-      </Link>
-    </ListItemButton>
+      </ListItemButton>
+    </Link>
   );
 }
 
@@ -173,12 +173,12 @@ function NavItemSm(
   } & PropsWithChildren
 ) {
   return (
-    <ListItemButton sx={{ width: "fit-content", mx: "auto" }}>
-      <Link href={props.link}>
+    <Link href={props.link}>
+      <ListItemButton sx={{ width: "fit-content", mx: "auto" }}>
         <ListItemIcon sx={{ minWidth: "fit-content" }}>
           {props.children}
         </ListItemIcon>
-      </Link>
-    </ListItemButton>
+      </ListItemButton>
+    </Link>
   );
 }
