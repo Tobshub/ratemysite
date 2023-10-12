@@ -8,6 +8,8 @@ import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import HighlightOffIcon from "@mui/icons-material/HighlightOff";
 import { ClientToken } from "@/utils/client_token";
 import { type NextRouter, useRouter } from "next/router";
+import { alphaNumericString } from "@/utils/zod";
+import { TRPCClientError } from "@trpc/client";
 
 export default function Auth() {
   const [isLogin, setIsLogin] = useState(false);
@@ -16,7 +18,7 @@ export default function Auth() {
   return isLogin ? (
     <Login router={router} toggle={() => setIsLogin(false)} />
   ) : (
-    <Signup router={router}toggle={() => setIsLogin(true)} />
+    <Signup router={router} toggle={() => setIsLogin(true)} />
   );
 }
 
@@ -26,24 +28,36 @@ interface AuthComponent {
 }
 
 function Signup(props: AuthComponent) {
-  // TODO: display error message
   const [errorMsg, setErrorMsg] = useState("");
   const signupMut = api.auth.signup.useMutation({
     onSuccess: (data) => {
       setErrorMsg("");
-      ClientToken.set(data);
-      // TODO: redirect to user profile or cb in url
+      ClientToken.set(data.token);
+      props.router.push(`/profile/${data.name}`);
     },
     onError: (e) => {
+      if (e instanceof TRPCClientError) {
+        try {
+          const err: { message: string } = JSON.parse(e.message)[0]
+          setErrorMsg(err.message);
+        } catch {
+         setErrorMsg("Something went wrong!") 
+        }
+        return;
+      }
       setErrorMsg(e.message);
     },
   });
-  const [input, setInput] = useState({ username: "", password: "" });
 
+  // TODO: make sure username is alphaNumericString
+  const [input, setInput] = useState({ username: "", password: "" });
   const [usernameAvailable, setUsernameAvailable] = useState(false);
   api.auth.checkUsernameAvailable.useQuery(input.username, {
     cacheTime: 0,
-    enabled: !!input.username && input.username.length >= 5,
+    enabled:
+      !!input.username &&
+      input.username.length >= 5 &&
+      input.username.length <= 25,
     onSuccess: (data) => setUsernameAvailable(data),
     onError: () => setUsernameAvailable(false),
   });
@@ -63,7 +77,7 @@ function Signup(props: AuthComponent) {
         <title>Sign Up | RateMySite</title>
       </Head>
       <main className={styles.main}>
-        <div className="rms_logo" onClick={() => props.router.push("/")}/>
+        <div className="rms_logo" onClick={() => props.router.push("/")} />
         <h1>Sign Up</h1>
         <form className={styles.form} onSubmit={submit}>
           <Typography color="red" fontSize={12}>
@@ -80,13 +94,15 @@ function Signup(props: AuthComponent) {
               !!input.username.length &&
               (input.username.length < 5
                 ? "Username is too short"
+                : input.username.length > 25
+                ? "Username is too long"
                 : !usernameAvailable
                 ? "Username is already taken"
                 : "")
             }
             onChange={(e) => {
-              setInput((state) => ({ ...state, username: e.target.value }));
-              if (e.target.value.length < 5) {
+              setInput((state) => ({ ...state, username: e.target.value.toLowerCase() }));
+              if (e.target.value.length < 5 || e.target.value.length > 25) {
                 setUsernameAvailable(false);
               }
             }}
@@ -145,8 +161,8 @@ function Login(props: AuthComponent) {
   const loginMut = api.auth.login.useMutation({
     onSuccess: (data) => {
       setErrorMsg("");
-      ClientToken.set(data);
-      // TODO: redirect to user profile or cb in url
+      ClientToken.set(data.token);
+      props.router.push(`/profile/${data.name}`);
     },
     onError: (e) => {
       setErrorMsg(e.message);

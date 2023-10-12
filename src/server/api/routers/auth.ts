@@ -2,11 +2,18 @@ import { createTRPCRouter, publicProcedure } from "@/server/api/trpc";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { AppToken, Encrypt } from "../auth";
+import { alphaNumericString } from "@/utils/zod";
 
 export const AuthRouter = createTRPCRouter({
   signup: publicProcedure
-    .input(z.object({ name: z.string().min(5), password: z.string().min(8) }))
+    .input(
+      z.object({
+        name: alphaNumericString("Username").min(5).max(25),
+        password: z.string().min(8),
+      })
+    )
     .mutation(async ({ input, ctx }) => {
+      input.name = input.name.toLowerCase();
       const post_id = crypto.randomUUID();
       const res = await ctx.db.create("user", {
         level: 0,
@@ -35,7 +42,9 @@ export const AuthRouter = createTRPCRouter({
   login: publicProcedure
     .input(z.object({ name: z.string(), password: z.string() }))
     .mutation(async ({ input, ctx }) => {
-      const res = await ctx.db.findUnique("user", { name: input.name });
+      const res = await ctx.db.findUnique("user", {
+        name: input.name.toLowerCase(),
+      });
       if (!res.data || res.status !== 200) {
         throw new TRPCError({
           code: "UNAUTHORIZED",
@@ -56,7 +65,9 @@ export const AuthRouter = createTRPCRouter({
   checkUsernameAvailable: publicProcedure
     .input(z.string().min(5))
     .query(async ({ input, ctx }) => {
-      const res = await ctx.db.findUnique("user", { name: input });
+      const res = await ctx.db.findUnique("user", {
+        name: input.toLowerCase(),
+      });
       if (res.status === 404) {
         return true;
       }
