@@ -1,5 +1,6 @@
-import { api } from "@/utils/api";
+import { api, type RouterOutputs } from "@/utils/api";
 import styles from "@/styles/feed.module.css";
+import Link from "next/link";
 
 export default function Feed() {
   const { data, error, isInitialLoading } = api.post.feed.useQuery({});
@@ -13,17 +14,7 @@ export default function Feed() {
   );
 }
 
-function Post(props: {
-  title: string;
-  content: string;
-  pictures: string[] | undefined;
-  reply_id: string;
-  created_at: Date;
-  author: {
-    name: string;
-    display_picture: string | undefined;
-  };
-}) {
+function Post(props: RouterOutputs["post"]["feed"][0]) {
   return (
     <div className={styles.post}>
       <PostAuthor {...props.author} />
@@ -46,8 +37,13 @@ function PostAuthor(props: {
 }) {
   return (
     <div>
-      <img src={props.display_picture} />
-      <span>{props.name}</span>
+      <Link
+        href={`/profile/${props.name}`}
+        style={{ color: "inherit", textDecoration: "none" }}
+      >
+        <img src={props.display_picture} />
+        <span>{props.name}</span>
+      </Link>
     </div>
   );
 }
