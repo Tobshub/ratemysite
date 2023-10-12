@@ -47,6 +47,9 @@ dependencies:
   bcrypt:
     specifier: ^5.1.1
     version: 5.1.1
+  boring-avatars:
+    specifier: ^1.10.1
+    version: 1.10.1
   jsonwebtoken:
     specifier: ^9.0.2
     version: 9.0.2
@@ -1192,6 +1195,10 @@ packages:
     transitivePeerDependencies:
       - encoding
       - supports-color
+    dev: false
+
+  /boring-avatars@1.10.1:
+    resolution: {integrity: sha512-WcgHDeLrazCR03CDPEvCchLsUecZAZvs4F6FnMiGlTEjyQQf15Q5TRl4EUaAQ1dacvhPq7lC9EOTWkCojQ6few==}
     dev: false
 
   /brace-expansion@1.1.11:
