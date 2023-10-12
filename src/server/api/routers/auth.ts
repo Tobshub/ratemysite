@@ -30,7 +30,7 @@ export const AuthRouter = createTRPCRouter({
       }
 
       const token = AppToken.generate(res.data.post_id);
-      return token;
+      return { token, name: res.data.name };
     }),
   login: publicProcedure
     .input(z.object({ name: z.string(), password: z.string() }))
@@ -51,7 +51,7 @@ export const AuthRouter = createTRPCRouter({
       }
 
       const token = AppToken.generate(res.data.post_id);
-      return token;
+      return { token, name: res.data.name };
     }),
   checkUsernameAvailable: publicProcedure
     .input(z.string().min(5))
