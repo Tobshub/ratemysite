@@ -1,0 +1,17 @@
+.profile {
+  .highlighted_info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+
+    .display_picture {
+    }
+
+    .info_text {
+    }
+  }
+
+  .secondary_info {
+    margin-top: 1rem;
+  }
+}

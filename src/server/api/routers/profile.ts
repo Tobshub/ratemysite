@@ -8,6 +8,50 @@ import { z } from "zod";
 import { Encrypt } from "../auth";
 
 export const ProfileRouter = createTRPCRouter({
+  getWithPostId: privateProcedure.query(async ({ ctx }) => {
+    const user = await ctx.db.findUnique("user", { post_id: ctx.auth.post_id });
+
+    if (!user.data || user.status !== 200) {
+      if (user.status === 400) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "User profile not found",
+        });
+      }
+
+      throw new TRPCError({
+        code: "BAD_REQUEST",
+        message: "Something went wrong!",
+      });
+    }
+
+    // const user_posts = await ctx.db.findMany("post", {
+    //   user_id: user.data.post_id,
+    // });
+
+    // if (user_posts.status !== 200 || !user_posts.data) {
+    //   user_posts.data = [];
+    // }
+
+    // const public_post_data = user_posts.data.map((post) => ({
+    //   title: post.title,
+    //   content: post.content,
+    //   pictures: post.pictures,
+    //   reply_id: post.reply_id,
+    //   created_at: post.created_at,
+    // }));
+
+    return {
+      name: user.data.name,
+      // email: user.data.email,
+      // level: user.data.level,
+      // bio: user.data.bio,
+      // DOB: user.data.DOB,
+      // created_at: user.data.created_at,
+      // display_picture: user.data.display_picture,
+      // posts: public_post_data,
+    };
+  }),
   get: publicProcedure.input(z.string()).query(async ({ input, ctx }) => {
     const user = await ctx.db.findUnique("user", { name: input });
 
