@@ -20,7 +20,7 @@ import { api } from "@/utils/api";
 import { ChangeEventHandler, FormEventHandler, useRef, useState } from "react";
 import { Cancel as CancelIcon, ImageSharp } from "@mui/icons-material";
 import type { PostFlags } from "@/server/api/tdb";
-import { PostFlagNames } from "./post-flags";
+import { PostFlagNames } from "@/components/post";
 
 export default function CreatePost(props: {
   open: boolean;

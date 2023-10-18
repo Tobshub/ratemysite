@@ -5,7 +5,14 @@ import Avatar from "boring-avatars";
 import { useRouter } from "next/router";
 import { Chip, Typography } from "@mui/material";
 import type { PostFlags } from "@/server/api/tdb";
-import { PostFlagNames } from "./post-flags";
+
+export const PostFlagNames: Record<PostFlags, string> = {
+  mobile: "Mobile",
+  desktop: "Desktop",
+  login_required: "Login required",
+  beginner: "Beginner",
+  urgent: "Urgent",
+};
 
 export default function Post(
   props: RouterOutputs["post"]["feed"][0] & { large?: boolean }
