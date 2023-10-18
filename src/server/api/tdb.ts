@@ -1,6 +1,13 @@
 import Tobsdb, { PrimaryKey, Unique, Default } from "tobsdb";
 import { env } from "@/env.mjs";
 
+export type PostFlags =
+  | "beginner"
+  | "login_required"
+  | "desktop"
+  | "mobile"
+  | "urgent";
+
 type DB = {
   user: {
     id: PrimaryKey<number>;
@@ -20,6 +27,7 @@ type DB = {
     user_id: string;
     title: string;
     content: string;
+    flags?: PostFlags[];
     pictures?: string[];
     reply_id: Unique<string>;
     created_at: Default<Date>;
@@ -42,3 +50,5 @@ export const db = await Tobsdb.connect<DB>(
   { auth: { username: env.TDB_USERNAME, password: env.TDB_PASSWORD } },
   { log: env.NODE_ENV === "development" }
 );
+
+process.prependOnceListener("SIGINT", () => db.disconnect());

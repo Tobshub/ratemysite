@@ -1,12 +1,26 @@
 import { ClientToken } from "@/utils/client_token";
 import styles from "@/styles/create-post.module.css";
-import { IconButton, TextField, Typography } from "@mui/material";
+import {
+  Box,
+  Chip,
+  FormControl,
+  IconButton,
+  InputLabel,
+  MenuItem,
+  OutlinedInput,
+  Select,
+  type SxProps,
+  TextField,
+  Typography,
+} from "@mui/material";
 import Dialog from "@mui/material/Dialog";
 import { useRouter } from "next/router";
 import { LoadingButton } from "./button";
 import { api } from "@/utils/api";
 import { ChangeEventHandler, FormEventHandler, useRef, useState } from "react";
 import { Cancel as CancelIcon, ImageSharp } from "@mui/icons-material";
+import type { PostFlags } from "@/server/api/tdb";
+import { PostFlagNames } from "./post-flags";
 
 export default function CreatePost(props: {
   open: boolean;
@@ -24,10 +38,7 @@ export default function CreatePost(props: {
     },
   });
 
-  // TODO:
-  // create a button that essentially calls the click event on an input with
-  // type file; the input files will be put into state; the previews will be
-  // shown; and the files will be uploaded in the new post mutation
+  const [postFlags, setPostFlags] = useState<string[]>([]);
   const [pictures, setPictures] = useState<string[]>([]);
   const reader = new FileReader();
   const pictureInputRef = useRef<HTMLInputElement>(null);
@@ -71,6 +82,7 @@ export default function CreatePost(props: {
       title: data.title.toString(),
       content: data.content.toString(),
       pictures: pictures,
+      flags: postFlags,
     });
   };
 
@@ -93,6 +105,27 @@ export default function CreatePost(props: {
           label="Title"
           name="title"
           required
+        />
+        <MuiChipSelector
+          className={styles.form_child}
+          label="Flags"
+          options={
+            [
+              { value: "beginner", name: PostFlagNames["beginner"] },
+              { value: "mobile", name: PostFlagNames["mobile"] },
+              { value: "desktop", name: PostFlagNames["desktop"] },
+              { value: "urgent", name: PostFlagNames["urgent"] },
+              {
+                value: "login_required",
+                name: PostFlagNames["login_required"],
+              },
+            ] as {
+              value: PostFlags;
+              name: string;
+            }[]
+          }
+          setState={setPostFlags}
+          state={postFlags}
         />
         <TextField
           className={styles.form_child}
@@ -163,5 +196,42 @@ export default function CreatePost(props: {
         </LoadingButton>
       </form>
     </Dialog>
+  );
+}
+
+function MuiChipSelector(props: {
+  state: string[];
+  setState: (state: string[]) => void;
+  options: { name: string; value: string }[];
+  className?: string;
+  label: string;
+  sx?: SxProps;
+}) {
+  return (
+    <FormControl sx={props.sx} className={props.className}>
+      <InputLabel>{props.label}</InputLabel>
+      <Select
+        label={props.label}
+        multiple
+        value={props.state}
+        onChange={(e) => {
+          props.setState(e.target.value as string[]);
+        }}
+        input={<OutlinedInput label={props.label} />}
+        renderValue={(selected) => (
+          <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
+            {selected.map((value) => (
+              <Chip key={value} label={value} />
+            ))}
+          </Box>
+        )}
+      >
+        {props.options.map((item) => (
+          <MenuItem key={item.name} value={item.value}>
+            {item.name}
+          </MenuItem>
+        ))}
+      </Select>
+    </FormControl>
   );
 }

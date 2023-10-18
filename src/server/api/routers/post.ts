@@ -5,6 +5,7 @@ import {
 } from "@/server/api/trpc";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
+import { PostFlags } from "../tdb";
 
 export const PostRouter = createTRPCRouter({
   feed: publicProcedure
@@ -43,6 +44,7 @@ export const PostRouter = createTRPCRouter({
         posts.push({
           title: post.title,
           content: post.content,
+          flags: post.flags,
           pictures: post.pictures,
           reply_id: post.reply_id,
           created_at: post.created_at,
@@ -89,6 +91,7 @@ export const PostRouter = createTRPCRouter({
     return {
       title: res.data.title,
       content: res.data.content,
+      flags: res.data.flags,
       pictures: res.data.pictures,
       reply_id: res.data.reply_id,
       created_at: res.data.created_at,
@@ -103,6 +106,7 @@ export const PostRouter = createTRPCRouter({
       z.object({
         content: z.string().min(1),
         title: z.string().min(1),
+        flags: z.string().array(),
         pictures: z.string().array(),
       })
     )
@@ -112,6 +116,7 @@ export const PostRouter = createTRPCRouter({
         user_id: ctx.auth.post_id,
         title: input.title,
         content: input.content,
+        flags: input.flags as PostFlags[],
         pictures: input.pictures,
         reply_id,
       });
