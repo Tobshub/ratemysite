@@ -6,7 +6,7 @@ import { useRouter } from "next/router";
 import { LoadingButton } from "./button";
 import { api } from "@/utils/api";
 import { ChangeEventHandler, FormEventHandler, useRef, useState } from "react";
-import { Close, ImageSharp } from "@mui/icons-material";
+import { Cancel as CancelIcon, ImageSharp } from "@mui/icons-material";
 
 export default function CreatePost(props: {
   open: boolean;
@@ -117,7 +117,13 @@ export default function CreatePost(props: {
                     });
                   }}
                 >
-                  <Close />
+                  <CancelIcon
+                    sx={{
+                      color: "white",
+                      backgroundColor: "black",
+                      borderRadius: "50%",
+                    }}
+                  />
                 </IconButton>
               </div>
             ))}
