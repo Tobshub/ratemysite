@@ -8,6 +8,8 @@ export type PostFlags =
   | "mobile"
   | "urgent";
 
+// TODO: create media table and replace data URIs with unique identifier
+// that points to media file in media table
 type DB = {
   user: {
     id: PrimaryKey<number>;
@@ -18,6 +20,7 @@ type DB = {
     bio?: string;
     display_picture?: string;
     DOB?: Date;
+    // user_id in post and reply table
     post_id: Unique<string>;
     created_at: Default<Date>;
   };
@@ -29,6 +32,7 @@ type DB = {
     content: string;
     flags?: PostFlags[];
     pictures?: string[];
+    // post_id/parent_id in reply table
     reply_id: Unique<string>;
     created_at: Default<Date>;
   };
@@ -38,7 +42,8 @@ type DB = {
     user_id: string;
     content: string;
     post_id: string;
-    parent_id: string;
+    parent_id?: string;
+    // could be a parent_id in reply table
     reply_id: Unique<string>;
     created_at: Default<Date>;
   };

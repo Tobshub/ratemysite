@@ -29,8 +29,8 @@ $TABLE reply {
   content     String
   // the root post_id
   post_id     String  relation(post.reply_id)
-  // the id either the root post or the parent reply
-  parent_id   String  relation(reply.reply_id)
+  // the id of the root post
+  parent_id   String  relation(reply.reply_id) optional(true)
   reply_id    String  unique(true)
   created_at  Date    default(now)
 }
