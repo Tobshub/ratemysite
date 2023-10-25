@@ -69,8 +69,8 @@ dependencies:
     specifier: ^1.13.1
     version: 1.13.1
   tobsdb:
-    specifier: ^1.1.8
-    version: 1.1.8
+    specifier: ^1.1.9
+    version: 1.1.9
   zod:
     specifier: ^3.21.4
     version: 3.21.4
@@ -3352,8 +3352,8 @@ packages:
       is-number: 7.0.0
     dev: true
 
-  /tobsdb@1.1.8:
-    resolution: {integrity: sha512-MSAG6ou2d9nxvV9JGdQX5s1ohYwmn8o3cO4zoH4pPXMncjzZZwoagtvNDp79KMtvxEopi6trS7TI5uH/hla7iw==}
+  /tobsdb@1.1.9:
+    resolution: {integrity: sha512-ZEBK1w7N8XtoTClJCcWVkqY1d/tYWwK3cTsMw5hkPG7fAwNfSK8gWc3RGVmZip2fisT76/ItNk6VBJugpgi3zA==}
     engines: {node: '>=18', npm: '>=8'}
     dependencies:
       ws: 8.14.2
