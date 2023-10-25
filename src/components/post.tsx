@@ -3,8 +3,9 @@ import styles from "@/styles/post.module.css";
 import Link from "next/link";
 import Avatar from "boring-avatars";
 import { useRouter } from "next/router";
-import { Chip, Typography } from "@mui/material";
+import { Chip, Dialog, Typography } from "@mui/material";
 import type { PostFlags } from "@/server/api/tdb";
+import { useState } from "react";
 
 export const PostFlagNames: Record<PostFlags, string> = {
   mobile: "Mobile",
@@ -34,11 +35,37 @@ export default function Post(
       {props.pictures && props.pictures.length ? (
         <div className={styles.post_pic_container}>
           {props.pictures.map((pic, idx) => (
-            <img className={styles.post_pic} src={pic} key={idx} />
+            <PostImage src={pic} key={idx} />
           ))}
         </div>
       ) : null}
+      <PostActions {...props} />
     </div>
+  );
+}
+
+// TODO: `reply`, `share` buttons go here
+function PostActions(props: { reply_id: string; large?: boolean }) {
+  return <div className={styles.post_actions}></div>;
+}
+
+// TODO: implement next/back when there's more than one image
+function PostImage(props: { src: string }) {
+  const [isOpen, setIsOpen] = useState(false);
+
+  return (
+    <>
+      <img
+        className={styles.post_pic}
+        src={props.src}
+        onClick={() => setIsOpen(true)}
+      />
+      {isOpen ? (
+        <Dialog open={isOpen} onClose={() => setIsOpen(false)}>
+          <img className={styles.open_post_pic} src={props.src} />
+        </Dialog>
+      ) : null}
+    </>
   );
 }
 
