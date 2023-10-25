@@ -80,6 +80,7 @@ export const ProfileRouter = createTRPCRouter({
     const public_post_data = user_posts.data.map((post) => ({
       title: post.title,
       content: post.content,
+      flags: post.flags,
       pictures: post.pictures,
       reply_id: post.reply_id,
       created_at: post.created_at,
