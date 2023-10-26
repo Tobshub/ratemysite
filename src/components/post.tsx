@@ -27,7 +27,7 @@ export default function Post(props: RouterOutputs["post"]["feed"][0] & { large?:
       <PostAuthor {...props.author} fontSize={props.large ? 28 : undefined} />
       {props.flags && props.flags.length ? <PostFlags flags={props.flags} /> : null}
       <h2>{props.title}</h2>
-      <p>{props.content}</p>
+      <p style={{ whiteSpace: "pre-line" }}>{props.content}</p>
       {props.pictures && props.pictures.length ? (
         <div className={styles.post_pic_container} onClick={(e) => e.stopPropagation()}>
           {props.pictures.map((pic, idx) => (
