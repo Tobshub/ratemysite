@@ -65,7 +65,7 @@ function PostImage(props: { src: string }) {
 function PostFlags(props: { flags: PostFlags[] }) {
   return (
     <div
-      style={{ display: "flex", gap: ".2rem" }}
+      style={{ display: "flex", gap: ".2rem", flexWrap: "wrap" }}
       onClick={(e) => /* prevent opening post */ e.stopPropagation()}
     >
       {props.flags.map((flag, idx) => (

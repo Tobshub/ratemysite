@@ -1,5 +1,6 @@
-.post {
-  border: 2px solid #888;
+.post,
+.post_large {
+  border: 2px solid #555;
   border-radius: 8px;
   padding: 0.5rem;
   width: 98%;
@@ -9,43 +10,39 @@
   font-size: 18px;
   margin-bottom: 0.5rem;
 
+  .post_pic {
+    object-fit: cover;
+    object-position: center;
+    border-radius: 10px;
+  }
+
+  .post_pic:hover {
+    outline: 1px solid white;
+  }
+}
+
+.open_post_pic {
+  object-fit: cover;
+  object-position: center;
+  max-width: 100%;
+  max-height: 100%;
+}
+
+.post {
   .post_pic_container {
     display: flex;
     flex-wrap: wrap;
     justify-content: flex-start;
     gap: 0.4rem;
+    width: fit-content;
 
     .post_pic {
       width: 100px;
       height: 100px;
-      object-fit: cover;
-      object-position: center;
-      border-radius: 10px;
-    }
-
-    .open_post_pic {
-      object-fit: cover;
-      object-position: center;
-      border-radius: 10px;
-    }
-
-    .post_pic:hover {
-      outline: 1px solid black;
     }
   }
 }
-
 .post_large {
-  border: 2px solid #000;
-  border-radius: 6px;
-  padding: 0.5rem;
-  width: 98%;
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  font-size: 18px;
-  margin-bottom: 0.5rem;
-
   .post_pic_container {
     display: flex;
     flex-wrap: wrap;
@@ -55,13 +52,6 @@
     .post_pic {
       width: 200px;
       height: 200px;
-      object-fit: cover;
-      object-position: center;
-      border-radius: 10px;
-    }
-
-    .post_pic:hover {
-      outline: 1px solid black;
     }
   }
 }

@@ -86,16 +86,12 @@ function NavRegular(props: NavBarProps) {
 function NavSmall(props: NavBarProps) {
   return (
     <header className={styles.navbar_sm}>
-      <nav style={{ display: "flex", flexDirection: "column" }}>
-        <div
-          className="rms_logo"
-          style={{ margin: "0 auto" }}
-          onClick={() => props.router.push("/")}
-        />
+      <nav className={styles.navbar_sm_nav}>
+        <div className="rms_logo" onClick={() => props.router.push("/")} />
         <List
           sx={{
             display: "flex",
-            flexDirection: "column",
+            flexDirection: "inherit",
             justifyContent: "center",
             px: 0,
           }}
