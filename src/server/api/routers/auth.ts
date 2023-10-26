@@ -62,16 +62,14 @@ export const AuthRouter = createTRPCRouter({
       const token = AppToken.generate(res.data.post_id);
       return { token, name: res.data.name };
     }),
-  checkUsernameAvailable: publicProcedure
-    .input(z.string().min(5))
-    .query(async ({ input, ctx }) => {
-      const res = await ctx.db.findUnique("user", {
-        name: input.toLowerCase(),
-      });
-      if (res.status === 404) {
-        return true;
-      }
+  checkUsernameAvailable: publicProcedure.input(z.string().min(5)).query(async ({ input, ctx }) => {
+    const res = await ctx.db.findUnique("user", {
+      name: input.toLowerCase(),
+    });
+    if (res.status === 404) {
+      return true;
+    }
 
-      return false;
-    }),
+    return false;
+  }),
 });

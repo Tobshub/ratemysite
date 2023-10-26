@@ -15,25 +15,21 @@ export const PostFlagNames: Record<PostFlags, string> = {
   urgent: "Urgent",
 };
 
-export default function Post(
-  props: RouterOutputs["post"]["feed"][0] & { large?: boolean }
-) {
+export default function Post(props: RouterOutputs["post"]["feed"][0] & { large?: boolean }) {
   const router = useRouter();
 
   return (
     <div
       className={props.large ? styles.post_large : styles.post}
       onClick={() => router.push(`/post/${props.reply_id}`)}
-      style={{ cursor: "pointer" }}
+      style={props.large ? {} : { cursor: "pointer" }}
     >
       <PostAuthor {...props.author} fontSize={props.large ? 28 : undefined} />
-      {props.flags && props.flags.length ? (
-        <PostFlags flags={props.flags} />
-      ) : null}
+      {props.flags && props.flags.length ? <PostFlags flags={props.flags} /> : null}
       <h2>{props.title}</h2>
       <p>{props.content}</p>
       {props.pictures && props.pictures.length ? (
-        <div className={styles.post_pic_container}>
+        <div className={styles.post_pic_container} onClick={(e) => e.stopPropagation()}>
           {props.pictures.map((pic, idx) => (
             <PostImage src={pic} key={idx} />
           ))}
@@ -55,11 +51,7 @@ function PostImage(props: { src: string }) {
 
   return (
     <>
-      <img
-        className={styles.post_pic}
-        src={props.src}
-        onClick={() => setIsOpen(true)}
-      />
+      <img className={styles.post_pic} src={props.src} onClick={() => setIsOpen(true)} />
       {isOpen ? (
         <Dialog open={isOpen} onClose={() => setIsOpen(false)}>
           <img className={styles.open_post_pic} src={props.src} />
@@ -83,7 +75,7 @@ function PostFlags(props: { flags: PostFlags[] }) {
   );
 }
 
-function PostAuthor(props: {
+export function PostAuthor(props: {
   name: string;
   display_picture: string | undefined;
   fontSize?: number;
@@ -110,9 +102,7 @@ function PostAuthor(props: {
             colors={["#92A1C6", "#146A7C", "#F0AB3D", "#C271B4", "#C20D90"]}
           />
         )}
-        <Typography
-          sx={{ "&:hover": { fontWeight: "500" }, fontSize: props.fontSize }}
-        >
+        <Typography sx={{ "&:hover": { fontWeight: "500" }, fontSize: props.fontSize }}>
           {props.name}
         </Typography>
       </Link>

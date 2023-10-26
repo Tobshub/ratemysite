@@ -6,10 +6,7 @@ export default function Feed() {
 
   return (
     <main>
-      {data && data.length
-        ? data.map((post) => <Post key={post.reply_id} {...post} />)
-        : null}
+      {data && data.length ? data.map((post) => <Post key={post.reply_id} {...post} />) : null}
     </main>
   );
 }
-

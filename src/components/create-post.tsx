@@ -22,10 +22,7 @@ import { Cancel as CancelIcon, ImageSharp } from "@mui/icons-material";
 import type { PostFlags } from "@/server/api/tdb";
 import { PostFlagNames } from "@/components/post";
 
-export default function CreatePost(props: {
-  open: boolean;
-  close: () => void;
-}) {
+export default function CreatePost(props: { open: boolean; close: () => void }) {
   const router = useRouter();
   const [errorMsg, setErrorMsg] = useState("");
   const postMut = api.post.new.useMutation({
@@ -43,9 +40,7 @@ export default function CreatePost(props: {
   const reader = new FileReader();
   const pictureInputRef = useRef<HTMLInputElement>(null);
 
-  const handlePictureInputChange: ChangeEventHandler<HTMLInputElement> = async (
-    e
-  ) => {
+  const handlePictureInputChange: ChangeEventHandler<HTMLInputElement> = async (e) => {
     if (!e.target.files || !e.target.files.length) {
       return;
     }
@@ -143,9 +138,7 @@ export default function CreatePost(props: {
                   className={styles.preview_close}
                   onClick={() => {
                     setPictures((state) => {
-                      const newState = state.filter(
-                        (_, currIdx) => currIdx != idx
-                      );
+                      const newState = state.filter((_, currIdx) => currIdx != idx);
                       return newState;
                     });
                   }}

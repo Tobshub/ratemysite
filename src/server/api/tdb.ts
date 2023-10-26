@@ -1,12 +1,7 @@
 import Tobsdb, { PrimaryKey, Unique, Default } from "tobsdb";
 import { env } from "@/env.mjs";
 
-export type PostFlags =
-  | "beginner"
-  | "login_required"
-  | "desktop"
-  | "mobile"
-  | "urgent";
+export type PostFlags = "beginner" | "login_required" | "desktop" | "mobile" | "urgent";
 
 // TODO: create media table and replace data URIs with unique identifier
 // that points to media file in media table

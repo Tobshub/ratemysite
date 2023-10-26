@@ -38,10 +38,10 @@ function Signup(props: AuthComponent) {
     onError: (e) => {
       if (e instanceof TRPCClientError) {
         try {
-          const err: { message: string } = JSON.parse(e.message)[0]
+          const err: { message: string } = JSON.parse(e.message)[0];
           setErrorMsg(err.message);
         } catch {
-         setErrorMsg("Something went wrong!") 
+          setErrorMsg("Something went wrong!");
         }
         return;
       }
@@ -54,10 +54,7 @@ function Signup(props: AuthComponent) {
   const [usernameAvailable, setUsernameAvailable] = useState(false);
   api.auth.checkUsernameAvailable.useQuery(input.username, {
     cacheTime: 0,
-    enabled:
-      !!input.username &&
-      input.username.length >= 5 &&
-      input.username.length <= 25,
+    enabled: !!input.username && input.username.length >= 5 && input.username.length <= 25,
     onSuccess: (data) => setUsernameAvailable(data),
     onError: () => setUsernameAvailable(false),
   });
@@ -125,12 +122,9 @@ function Signup(props: AuthComponent) {
             required
             error={input.password.length ? input.password.length < 8 : false}
             helperText={
-              !!input.password.length &&
-              (input.password.length < 8 ? "Password is too short" : "")
+              !!input.password.length && (input.password.length < 8 ? "Password is too short" : "")
             }
-            onChange={(e) =>
-              setInput((state) => ({ ...state, password: e.target.value }))
-            }
+            onChange={(e) => setInput((state) => ({ ...state, password: e.target.value }))}
           />
           <LoadingButton
             type="submit"
@@ -148,8 +142,7 @@ function Signup(props: AuthComponent) {
           </LoadingButton>
         </form>
         <p>
-          Already have an account?{" "}
-          <TextButton onClick={props.toggle}>Log in.</TextButton>
+          Already have an account? <TextButton onClick={props.toggle}>Log in.</TextButton>
         </p>
       </main>
     </>
@@ -198,19 +191,8 @@ function Login(props: AuthComponent) {
           <Typography color="red" fontSize={12}>
             {errorMsg}
           </Typography>
-          <TextField
-            variant="filled"
-            label="Username"
-            name="username"
-            required
-          />
-          <TextField
-            variant="filled"
-            label="Password"
-            name="password"
-            type="password"
-            required
-          />
+          <TextField variant="filled" label="Username" name="username" required />
+          <TextField variant="filled" label="Password" name="password" type="password" required />
           <LoadingButton
             type="submit"
             isLoading={loginMut.isLoading}
@@ -222,8 +204,7 @@ function Login(props: AuthComponent) {
           </LoadingButton>
         </form>
         <p>
-          Don't have an account?{" "}
-          <TextButton onClick={props.toggle}>Sign Up.</TextButton>
+          Don't have an account? <TextButton onClick={props.toggle}>Sign Up.</TextButton>
         </p>
       </main>
     </>

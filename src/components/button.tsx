@@ -58,14 +58,12 @@ interface LoadingButtonProps {
   isError: boolean;
 }
 
-export const LoadingButton = (
-  props: LoadingButtonProps & ButtonProps & PropsWithChildren
-) => {
+export const LoadingButton = (props: LoadingButtonProps & ButtonProps & PropsWithChildren) => {
   return (
     <Button
       className={props.className}
       variant={"contained"}
-      color={props.isSuccess ? "success" : props.isError ? "error" : "info"}
+      color={props.isSuccess ? "success" : props.isError ? "error" : "primary"}
       sx={props.sx}
       type={props.type}
       disabled={props.disabled}

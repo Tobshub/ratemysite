@@ -19,11 +19,7 @@ export default function ProfilePage() {
       </Head>
       <div className="page">
         <NavBar />
-        {profile.data ? (
-          <Profile {...profile.data} />
-        ) : (
-          "Profile does not exists"
-        )}
+        {profile.data ? <Profile {...profile.data} /> : "Profile does not exists"}
       </div>
     </>
   );
@@ -35,10 +31,7 @@ function Profile(props: RouterOutputs["profile"]["get"]) {
       <div className={styles.profile}>
         <div className={styles.highlighted_info}>
           {props.display_picture ? (
-            <img
-              src={props.display_picture}
-              className={styles.display_picture}
-            />
+            <img src={props.display_picture} className={styles.display_picture} />
           ) : (
             <Avatar
               size={75}

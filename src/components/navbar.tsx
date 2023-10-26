@@ -47,9 +47,7 @@ interface NavBarProps {
 function NavRegular(props: NavBarProps) {
   return (
     <header className={styles.navbar_reg}>
-      <nav
-        style={{ display: "flex", flexDirection: "column", padding: "0 .8rem" }}
-      >
+      <nav style={{ display: "flex", flexDirection: "column", padding: "0 .8rem" }}>
         <div
           className="rms_logo"
           style={{ margin: "0 auto" }}
@@ -79,10 +77,7 @@ function NavRegular(props: NavBarProps) {
         </div>
       </nav>
       {props.postDialogOpen && (
-        <CreatePost
-          open={props.postDialogOpen}
-          close={() => props.setPostDialogOpen(false)}
-        />
+        <CreatePost open={props.postDialogOpen} close={() => props.setPostDialogOpen(false)} />
       )}
     </header>
   );
@@ -135,10 +130,7 @@ function NavSmall(props: NavBarProps) {
         </div>
       </nav>
       {props.postDialogOpen && (
-        <CreatePost
-          open={props.postDialogOpen}
-          close={() => props.setPostDialogOpen(false)}
-        />
+        <CreatePost open={props.postDialogOpen} close={() => props.setPostDialogOpen(false)} />
       )}
     </header>
   );
@@ -151,14 +143,9 @@ function NavItem(
   } & PropsWithChildren
 ) {
   return (
-    <Link
-      href={props.link}
-      style={{ color: "inherit", textDecoration: "none" }}
-    >
+    <Link href={props.link} style={{ color: "inherit", textDecoration: "none" }}>
       <ListItemButton sx={{ display: "flex", gap: 1, alignItems: "center" }}>
-        <ListItemAvatar sx={{ minWidth: "fit-content" }}>
-          {props.icon}
-        </ListItemAvatar>
+        <ListItemAvatar sx={{ minWidth: "fit-content" }}>{props.icon}</ListItemAvatar>
         <ListItemText primaryTypographyProps={{ fontSize: "1.25rem" }}>
           {props.children}
         </ListItemText>
@@ -175,9 +162,7 @@ function NavItemSm(
   return (
     <Link href={props.link}>
       <ListItemButton sx={{ width: "fit-content", mx: "auto" }}>
-        <ListItemIcon sx={{ minWidth: "fit-content" }}>
-          {props.children}
-        </ListItemIcon>
+        <ListItemIcon sx={{ minWidth: "fit-content" }}>{props.children}</ListItemIcon>
       </ListItemButton>
     </Link>
   );
