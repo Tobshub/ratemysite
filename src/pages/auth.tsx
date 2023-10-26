@@ -32,6 +32,7 @@ function Signup(props: AuthComponent) {
   const signupMut = api.auth.signup.useMutation({
     onSuccess: (data) => {
       setErrorMsg("");
+      // TODO: store name globally on signup
       ClientToken.set(data.token);
       props.router.push(`/profile/${data.name}`);
     },
@@ -49,8 +50,8 @@ function Signup(props: AuthComponent) {
     },
   });
 
-  // TODO: make sure username is alphaNumericString
   const [input, setInput] = useState({ username: "", password: "" });
+  const [warnAlphaNumeric, setWarnAlphaNumeric] = useState(false);
   const [usernameAvailable, setUsernameAvailable] = useState(false);
   api.auth.checkUsernameAvailable.useQuery(input.username, {
     cacheTime: 0,
@@ -88,17 +89,30 @@ function Signup(props: AuthComponent) {
             required
             error={input.username.length ? !usernameAvailable : false}
             helperText={
-              !!input.username.length &&
-              (input.username.length < 5
-                ? "Username is too short"
-                : input.username.length > 25
-                ? "Username is too long"
-                : !usernameAvailable
-                ? "Username is already taken"
-                : "")
+              warnAlphaNumeric
+                ? "Username must be alphaNumeric"
+                : !!input.username.length &&
+                  (input.username.length < 5
+                    ? "Username is too short"
+                    : input.username.length > 25
+                    ? "Username is too long"
+                    : !usernameAvailable
+                    ? "Username is already taken"
+                    : "")
             }
             onChange={(e) => {
-              setInput((state) => ({ ...state, username: e.target.value.toLowerCase() }));
+              const value = e.target.value.toLowerCase();
+              if (value.length > 0) {
+                const check = alphaNumericString("Username").safeParse(value);
+                if (!check.success) {
+                  setWarnAlphaNumeric(true);
+                  return;
+                }
+              }
+
+              if (warnAlphaNumeric) setWarnAlphaNumeric(false);
+
+              setInput((state) => ({ ...state, username: value }));
               if (e.target.value.length < 5 || e.target.value.length > 25) {
                 setUsernameAvailable(false);
               }
@@ -154,6 +168,7 @@ function Login(props: AuthComponent) {
   const loginMut = api.auth.login.useMutation({
     onSuccess: (data) => {
       setErrorMsg("");
+      // TODO: store name and display picture globally on login
       ClientToken.set(data.token);
       props.router.push(`/profile/${data.name}`);
     },
