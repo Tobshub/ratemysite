@@ -81,7 +81,10 @@ export function PostAuthor(props: {
   fontSize?: number;
 }) {
   return (
-    <div onClick={(e) => /* prevent opening post */ e.stopPropagation()}>
+    <div
+      style={{ width: "fit-content" }}
+      onClick={(e) => /* prevent opening post */ e.stopPropagation()}
+    >
       <Link
         href={`/profile/${props.name}`}
         style={{
@@ -90,6 +93,7 @@ export function PostAuthor(props: {
           display: "flex",
           alignItems: "center",
           gap: ".5rem",
+          width: "fit-content",
         }}
       >
         {props.display_picture ? (
