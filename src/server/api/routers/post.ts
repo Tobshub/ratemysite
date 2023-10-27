@@ -53,7 +53,6 @@ export const PostRouter = createTRPCRouter({
 
       return posts;
     }),
-  // TODO: fix to include replies
   get: publicProcedure.input(z.string()).query(async ({ input, ctx }) => {
     const res = await ctx.db.findUnique("post", { reply_id: input });
 
