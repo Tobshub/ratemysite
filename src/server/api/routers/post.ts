@@ -167,4 +167,52 @@ export const PostRouter = createTRPCRouter({
         created_at: res.data.created_at,
       };
     }),
+  getReplies: publicProcedure
+    .input(z.object({ post_id: z.string(), parent_id: z.string().optional() }))
+    .query(async ({ input, ctx }) => {
+      const res = await ctx.db.findMany("reply", input);
+
+      if (res.status !== 200 || !res.data) {
+        ctx.log.error(res, "Error fetching replies");
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Something went wrong!",
+        });
+      }
+
+      if (!res.data.length) return [];
+
+      const replies = [];
+      for (const reply of res.data) {
+        const author = await ctx.db.findUnique("user", {
+          post_id: reply.user_id,
+        });
+
+        if (!author.data || author.status !== 200) {
+          if (author.status === 404) {
+            ctx.log.error(author, "Could not find post author");
+          } else {
+            ctx.log.error(author, "Error fetching post author");
+            throw new TRPCError({
+              code: "INTERNAL_SERVER_ERROR",
+              message: "Something went wrong!",
+            });
+          }
+        }
+
+        replies.push({
+          content: reply.content,
+          post_id: reply.post_id,
+          parent_id: reply.parent_id,
+          reply_id: reply.reply_id,
+          created_at: reply.created_at,
+          author: {
+            name: author.data.name,
+            display_picture: author.data.display_picture,
+          },
+        });
+      }
+
+      return replies;
+    }),
 });
