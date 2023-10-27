@@ -57,12 +57,12 @@ function NavRegular(props: NavBarProps) {
           <NavItem icon={<HomeIcon />} link="/">
             Home
           </NavItem>
-          <NavItem icon={<ExploreIcon />} link="/explore">
-            Explore
-          </NavItem>
-          <NavItem icon={<NotificationsIcon />} link="/notifications">
-            Notifications
-          </NavItem>
+          {/* <NavItem icon={<ExploreIcon />} link="/explore"> */}
+          {/*   Explore */}
+          {/* </NavItem> */}
+          {/* <NavItem icon={<NotificationsIcon />} link="/notifications"> */}
+          {/*   Notifications */}
+          {/* </NavItem> */}
           <NavItem icon={<PersonIcon />} link="/profile">
             Profile
           </NavItem>
@@ -99,12 +99,12 @@ function NavSmall(props: NavBarProps) {
           <NavItemSm link="/">
             <HomeIcon />
           </NavItemSm>
-          <NavItemSm link="/explore">
-            <ExploreIcon />
-          </NavItemSm>
-          <NavItemSm link="/notifications">
-            <NotificationsIcon />
-          </NavItemSm>
+          {/* <NavItemSm link="/explore"> */}
+          {/*   <ExploreIcon /> */}
+          {/* </NavItemSm> */}
+          {/* <NavItemSm link="/notifications"> */}
+          {/*   <NotificationsIcon /> */}
+          {/* </NavItemSm> */}
           <NavItemSm link="/profile">
             <PersonIcon />
           </NavItemSm>
