@@ -60,7 +60,7 @@ export const AuthRouter = createTRPCRouter({
       }
 
       const token = AppToken.generate(res.data.post_id);
-      return { token, name: res.data.name };
+      return { token, name: res.data.name, display_picture: res.data.display_picture };
     }),
   checkUsernameAvailable: publicProcedure.input(z.string().min(5)).query(async ({ input, ctx }) => {
     const res = await ctx.db.findUnique("user", {

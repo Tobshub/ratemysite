@@ -10,31 +10,36 @@ import { ClientToken } from "@/utils/client_token";
 import { type NextRouter, useRouter } from "next/router";
 import { alphaNumericString } from "@/utils/zod";
 import { TRPCClientError } from "@trpc/client";
+import { UserStore } from "@/utils/global-store";
 
 export default function Auth() {
   const [isLogin, setIsLogin] = useState(false);
   const router = useRouter();
+  const saveUserData = (data: { name: string; display_picture: string | undefined }) => {
+    UserStore.set("user", data);
+  };
 
   return isLogin ? (
-    <Login router={router} toggle={() => setIsLogin(false)} />
+    <Login router={router} toggle={() => setIsLogin(false)} saveUserData={saveUserData} />
   ) : (
-    <Signup router={router} toggle={() => setIsLogin(true)} />
+    <Signup router={router} toggle={() => setIsLogin(true)} saveUserData={saveUserData} />
   );
 }
 
-interface AuthComponent {
+interface AuthComponentProps {
   router: NextRouter;
   toggle: () => void;
+  saveUserData: (data: { name: string; display_picture: string | undefined }) => void;
 }
 
-function Signup(props: AuthComponent) {
+function Signup(props: AuthComponentProps) {
   const [errorMsg, setErrorMsg] = useState("");
   const signupMut = api.auth.signup.useMutation({
     onSuccess: (data) => {
       setErrorMsg("");
-      // TODO: store name globally on signup
       ClientToken.set(data.token);
-      props.router.push(`/profile/${data.name}`);
+      props.saveUserData({ name: data.name, display_picture: undefined });
+      props.router.push(`/profile/${data.name}?reload=true`);
     },
     onError: (e) => {
       if (e instanceof TRPCClientError) {
@@ -163,14 +168,14 @@ function Signup(props: AuthComponent) {
   );
 }
 
-function Login(props: AuthComponent) {
+function Login(props: AuthComponentProps) {
   const [errorMsg, setErrorMsg] = useState("");
   const loginMut = api.auth.login.useMutation({
     onSuccess: (data) => {
       setErrorMsg("");
-      // TODO: store name and display picture globally on login
       ClientToken.set(data.token);
-      props.router.push(`/profile/${data.name}`);
+      props.saveUserData({ name: data.name, display_picture: data.display_picture });
+      props.router.push(`/profile/${data.name}?reload=true`);
     },
     onError: (e) => {
       setErrorMsg(e.message);

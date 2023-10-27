@@ -39,12 +39,12 @@ export const ProfileRouter = createTRPCRouter({
 
     return {
       name: user.data.name,
+      display_picture: user.data.display_picture,
       // email: user.data.email,
       // level: user.data.level,
       // bio: user.data.bio,
       // DOB: user.data.DOB,
       // created_at: user.data.created_at,
-      // display_picture: user.data.display_picture,
       // posts: public_post_data,
     };
   }),
@@ -118,9 +118,7 @@ export const ProfileRouter = createTRPCRouter({
     .mutation(async ({ input, ctx }) => {
       const res = await ctx.db.updateUnique(
         "user",
-        {
-          post_id: ctx.auth.post_id,
-        },
+        { post_id: ctx.auth.post_id },
         {
           name: input.name,
           email: input.email,
