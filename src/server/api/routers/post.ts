@@ -133,7 +133,7 @@ export const PostRouter = createTRPCRouter({
         created_at: res.data.created_at,
       };
     }),
-  reply: publicProcedure
+  reply: privateProcedure
     .input(
       z.object({
         parent_id: z.string().optional(),
