@@ -4,7 +4,6 @@
   gap: 1rem;
 
   .reply {
-    cursor: pointer;
     border: 1px solid #555;
     padding: 0.5rem 0.4rem;
     border-radius: 6px;

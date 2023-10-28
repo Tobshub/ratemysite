@@ -71,7 +71,7 @@ function Replies(props: { post_id: string; optimisticReplies: TReply[] }) {
 
 function Reply(props: TReply & { router: NextRouter }) {
   return (
-    <div className={styles.reply} onClick={() => props.router.push(`/reply/${props.reply_id}`)}>
+    <div className={styles.reply}>
       <PostAuthor {...props.author} fontSize={20} />
       <p style={{ whiteSpace: "pre-line" }}>{props.content}</p>
     </div>
