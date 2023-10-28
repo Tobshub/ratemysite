@@ -1,3 +1,4 @@
+"use client";
 const TOKEN = "___rate_my_site_user_token";
 
 let localStorage: Storage | undefined;

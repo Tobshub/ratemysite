@@ -1,3 +1,4 @@
+"use client";
 import { SetStateAction, useCallback } from "react";
 import { create } from "zustand";
 
