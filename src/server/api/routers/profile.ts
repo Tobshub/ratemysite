@@ -84,6 +84,7 @@ export const ProfileRouter = createTRPCRouter({
 
     if (ctx.auth.post_id === user.data.post_id) {
       return {
+        is_you: true,
         name: user.data.name,
         email: user.data.email,
         level: user.data.level,
@@ -96,6 +97,7 @@ export const ProfileRouter = createTRPCRouter({
     }
 
     return {
+      is_you: false,
       name: user.data.name,
       level: user.data.level,
       bio: user.data.bio,
@@ -193,5 +195,8 @@ export const ProfileRouter = createTRPCRouter({
       return true;
     }),
   // TODO: verfying profile email
-  // consider brevo for this (maybe sendgrid)
+  // options:
+  // 1. resend
+  // 2. brevo
+  // 3. sendgrid
 });

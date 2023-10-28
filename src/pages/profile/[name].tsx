@@ -15,11 +15,15 @@ export default function ProfilePage() {
   return (
     <>
       <Head>
-        <title>{title.toString()} on RateMySite | RateMySite</title>
+        <title>{title} on RateMySite | RateMySite</title>
       </Head>
       <div className="page">
         <NavBar />
-        {profile.data ? <Profile {...profile.data} /> : "Profile does not exists"}
+        {profile.data ? (
+          <Profile {...profile.data} />
+        ) : profile.isInitialLoading ? null : (
+          "Profile does not exists"
+        )}
       </div>
     </>
   );
@@ -47,7 +51,7 @@ function Profile(props: RouterOutputs["profile"]["get"]) {
         </div>
         <div className={styles.secondary_info}>
           <ProfileLevel level={props.level} />
-          <p>{props.bio ?? "Rate or be Rate"}</p>
+          <p>{props.bio ?? "Rate or be Rated"}</p>
           <p>Rated since: {new Date(props.created_at).getUTCFullYear()}</p>
         </div>
       </div>
@@ -65,7 +69,11 @@ function Profile(props: RouterOutputs["profile"]["get"]) {
             />
           ))}
         </div>
-      ) : null}
+      ) : props.is_you ? (
+        <p>You have no posts yet!</p>
+      ) : (
+        <p>This user has no posts yet!</p>
+      )}
     </main>
   );
 }
