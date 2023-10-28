@@ -112,7 +112,6 @@ export const PostRouter = createTRPCRouter({
         title: input.title,
         content: input.content,
         flags: input.flags as PostFlags[],
-        pictures: input.pictures,
         reply_id,
       });
 
@@ -124,10 +123,40 @@ export const PostRouter = createTRPCRouter({
         });
       }
 
+      const pictures = [];
+      for (const picture of input.pictures) {
+        const res = await ctx.db.create("media", {
+          uid: crypto.randomUUID(),
+          data: picture,
+        });
+
+        if (res.status !== 201 || !res.data) {
+          ctx.log.error(res, "Error uploading media");
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "Something went wrong!",
+          });
+        }
+
+        pictures.push(res.data.uid);
+      }
+
+      // set post pictures are the generated urls
+      // can't do this before creating the posts because tdb will check if the pictures exist
+      const update = await ctx.db.updateUnique(
+        "post",
+        { reply_id: res.data.reply_id },
+        { pictures }
+      );
+
+      if (!update.data || update.status !== 200) {
+        ctx.log.error(update, "Error updating post with pictures");
+      }
+
       return {
         title: res.data.title,
         content: res.data.content,
-        pictures: res.data.pictures,
+        pictures: pictures,
         reply_id: res.data.reply_id,
         created_at: res.data.created_at,
       };

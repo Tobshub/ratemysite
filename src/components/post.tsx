@@ -48,13 +48,16 @@ function PostActions(props: { reply_id: string; large?: boolean }) {
 // TODO: implement next/back when there's more than one image
 function PostImage(props: { src: string }) {
   const [isOpen, setIsOpen] = useState(false);
+  const src = props.src.startsWith("data")
+    ? props.src
+    : `/api/img/${encodeURIComponent(props.src)}`;
 
   return (
     <>
-      <img className={styles.post_pic} src={props.src} onClick={() => setIsOpen(true)} />
+      <img className={styles.post_pic} loading="lazy" src={src} onClick={() => setIsOpen(true)} />
       {isOpen ? (
         <Dialog open={isOpen} onClose={() => setIsOpen(false)}>
-          <img className={styles.open_post_pic} src={props.src} />
+          <img className={styles.open_post_pic} src={src} />
         </Dialog>
       ) : null}
     </>

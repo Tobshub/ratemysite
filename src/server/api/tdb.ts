@@ -3,8 +3,6 @@ import { env } from "@/env.mjs";
 
 export type PostFlags = "beginner" | "login_required" | "desktop" | "mobile" | "urgent";
 
-// TODO: create media table and replace data URIs with unique identifier
-// that points to media file in media table
 type DB = {
   user: {
     id: PrimaryKey<number>;
@@ -41,6 +39,12 @@ type DB = {
     // could be a parent_id in reply table
     reply_id: Unique<string>;
     created_at: Default<Date>;
+  };
+
+  media: {
+    id: PrimaryKey<number>;
+    data: string;
+    uid: Unique<string>;
   };
 };
 
