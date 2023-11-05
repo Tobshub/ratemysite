@@ -14,4 +14,11 @@ export default createNextApiHandler({
           console.error(`❌ tRPC failed on ${path ?? "<no-path>"}: ${error.message}`);
         }
       : undefined,
+  maxBodySize: 1024 * 1024 * 5, // 5 MB
 });
+
+export const config = {
+  api: {
+    bodyParser: { sizeLimit: "5mb" },
+  },
+};
