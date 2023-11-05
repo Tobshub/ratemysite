@@ -177,6 +177,8 @@ export const PostRouter = createTRPCRouter({
         post_id: input.post_id,
         parent_id: input.parent_id,
         reply_id,
+        up_voters: [],
+        down_voters: [],
       });
 
       if (!res.data || res.status !== 201) {
@@ -218,9 +220,9 @@ export const PostRouter = createTRPCRouter({
 
         if (!author.data || author.status !== 200) {
           if (author.status === 404) {
-            ctx.log.error(author, "Could not find post author");
+            ctx.log.error(author, "Could not find reply author");
           } else {
-            ctx.log.error(author, "Error fetching post author");
+            ctx.log.error(author, "Error fetching reply author");
             throw new TRPCError({
               code: "INTERNAL_SERVER_ERROR",
               message: "Something went wrong!",
@@ -233,6 +235,11 @@ export const PostRouter = createTRPCRouter({
           post_id: reply.post_id,
           parent_id: reply.parent_id,
           reply_id: reply.reply_id,
+          user_vote: ctx.auth.post_id
+            ? GetUserVote(ctx.auth.post_id, reply.up_voters, reply.down_voters)
+            : 0,
+          up_votes: reply.up_voters.length,
+          down_votes: reply.down_voters.length,
           created_at: reply.created_at,
           author: {
             name: author.data.name,
@@ -243,4 +250,91 @@ export const PostRouter = createTRPCRouter({
 
       return replies;
     }),
+  voteOnReply: privateProcedure
+    .input(z.object({ reply_id: z.string(), userVote: z.number() }))
+    .mutation(async ({ input, ctx }) => {
+      const reply = await ctx.db.findUnique("reply", { reply_id: input.reply_id });
+
+      if (!reply.data || reply.status !== 200) {
+        if (reply.status === 404) {
+          throw new TRPCError({ code: "NOT_FOUND", message: "Reply no longer exists" });
+        } else {
+          ctx.log.error(reply, "Error fetching reply");
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "Something went wrong!",
+          });
+        }
+      }
+
+      const prevVote = GetUserVote(ctx.auth.post_id, reply.data.up_voters, reply.data.down_voters);
+      if (prevVote === input.userVote) {
+        return {
+          user_vote: prevVote,
+          up_votes: reply.data.up_voters.length,
+          down_votes: reply.data.down_voters.length,
+        };
+      }
+
+      let newDownVoters = reply.data.down_voters;
+      let newUpVoters = reply.data.up_voters;
+
+      if (prevVote < 0) {
+        newDownVoters = reply.data.down_voters.filter((voter_id) => voter_id != ctx.auth.post_id);
+      } else if (prevVote > 0) {
+        newUpVoters = reply.data.up_voters.filter((voter_id) => voter_id != ctx.auth.post_id);
+      }
+
+      // Consideration:
+      // what happens if after this initial reply data has been fetched
+      // the reply is mutated (i.e. another voteOnReply request is completed)
+      // other start -> this start -> other finish -> this finish
+      // that would mean "newDownVoters" and "newUpVoters" may contain stale data
+      // and using either in the request might not be the best idea
+      let res;
+
+      if (input.userVote > 0) {
+        // upvote
+        res = await ctx.db.updateUnique(
+          "reply",
+          { id: reply.data.id },
+          { up_voters: { push: [ctx.auth.post_id] }, down_voters: newDownVoters }
+        );
+      } else if (input.userVote < 0) {
+        // downvote
+        res = await ctx.db.updateUnique(
+          "reply",
+          { id: reply.data.id },
+          { down_voters: { push: [ctx.auth.post_id] }, up_voters: newUpVoters }
+        );
+      } else {
+        // no vote
+        res = await ctx.db.updateUnique(
+          "reply",
+          { id: reply.data.id },
+          { up_voters: newUpVoters, down_voters: newDownVoters }
+        );
+      }
+
+      if (res.status !== 200 || !res.data) {
+        ctx.log.error(res, "Error voting on reply");
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Something went wrong!",
+        });
+      }
+
+      return {
+        user_vote: GetUserVote(ctx.auth.post_id, res.data.up_voters, res.data.down_voters),
+        up_votes: res.data.up_voters.length,
+        down_votes: res.data.down_voters.length,
+      };
+    }),
 });
+
+/** 1 for upvote, -1 for downvote, 0 for no vote */
+function GetUserVote(post_id: string, up_voters: string[], down_voters: string[]) {
+  if (up_voters.includes(post_id)) return 1;
+  if (down_voters.includes(post_id)) return -1;
+  return 0;
+}

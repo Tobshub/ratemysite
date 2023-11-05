@@ -27,11 +27,15 @@ $TABLE reply {
   id          Int     key(primary)
   user_id     String  relation(user.post_id)
   content     String
-  // the root post_id
+  // the reply_id of the root post
   post_id     String  relation(post.reply_id)
-  // the id of the root post
+  // the reply_id of the parent reply if any
   parent_id   String  relation(reply.reply_id) optional(true)
   reply_id    String  unique(true)
+
+  up_voters    Vector vector(String) relation(user.post_id)
+  down_voters  Vector vector(String) relation(user.post_id)
+
   created_at  Date    default(now)
 }
 

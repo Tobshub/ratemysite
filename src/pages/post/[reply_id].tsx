@@ -1,13 +1,14 @@
 import styles from "@/styles/post-page.module.css";
 import { LoadingButton } from "@/components/button";
 import { NavBar } from "@/components/navbar";
-import Post, { PostAuthor } from "@/components/post";
+import Post from "@/components/post";
 import { RouterOutputs, api } from "@/utils/api";
 import { CircularProgress, TextField, Typography } from "@mui/material";
 import { TRPCClientError } from "@trpc/client";
-import { type NextRouter, useRouter } from "next/router";
+import { useRouter } from "next/router";
 import { FormEventHandler, useState } from "react";
 import { UserStore } from "@/utils/global-store";
+import { Reply } from "@/components/reply";
 
 type TReply = RouterOutputs["post"]["getReplies"][0];
 
@@ -26,6 +27,8 @@ export default function PostPage() {
       </div>
     );
   }
+
+  // TODO: work on not found component
   if (!post.data) {
     return (
       <div className="page">
@@ -69,21 +72,18 @@ function Replies(props: { post_id: string; optimisticReplies: TReply[] }) {
   );
 }
 
-function Reply(props: TReply & { router: NextRouter }) {
-  return (
-    <div className={styles.reply}>
-      <PostAuthor {...props.author} fontSize={20} />
-      <p style={{ whiteSpace: "pre-line" }}>{props.content}</p>
-    </div>
-  );
-}
-
 function ReplyBox(props: { post_id: string; optimisticUpdate: (reply: TReply) => void }) {
   const userData = UserStore.get("user");
   const [errorMsg, setErrorMsg] = useState("");
   const replyMut = api.post.reply.useMutation({
     onSuccess: (data) => {
-      props.optimisticUpdate({ ...data, author: userData });
+      props.optimisticUpdate({
+        ...data,
+        author: userData,
+        user_vote: 0,
+        up_votes: 0,
+        down_votes: 0,
+      });
     },
     onError: (e) => {
       if (e instanceof TRPCClientError) {

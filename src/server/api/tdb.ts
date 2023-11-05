@@ -38,6 +38,8 @@ type DB = {
     parent_id?: string;
     // could be a parent_id in reply table
     reply_id: Unique<string>;
+    up_voters: string[];
+    down_voters: string[];
     created_at: Default<Date>;
   };
 
