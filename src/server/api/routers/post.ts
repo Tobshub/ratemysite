@@ -164,7 +164,7 @@ export const PostRouter = createTRPCRouter({
   reply: privateProcedure
     .input(
       z.object({
-        parent_id: z.string().optional(),
+        parent_id: z.string().nullish(),
         post_id: z.string(),
         content: z.string().min(1),
       })
@@ -198,7 +198,14 @@ export const PostRouter = createTRPCRouter({
       };
     }),
   getReplies: publicProcedure
-    .input(z.object({ post_id: z.string(), parent_id: z.string().optional() }))
+    .input(
+      z.object({
+        post_id: z.string(),
+        // default is important here because a null parent_id signifies
+        // the reply is to the root post
+        parent_id: z.string().nullish().default(null),
+      })
+    )
     .query(async ({ input, ctx }) => {
       const res = await ctx.db.findMany("reply", input);
 

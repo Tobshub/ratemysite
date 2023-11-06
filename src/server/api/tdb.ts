@@ -35,7 +35,7 @@ type DB = {
     user_id: string;
     content: string;
     post_id: string;
-    parent_id?: string;
+    parent_id?: string | null;
     // could be a parent_id in reply table
     reply_id: Unique<string>;
     up_voters: string[];
