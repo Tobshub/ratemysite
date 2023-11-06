@@ -2,15 +2,13 @@ import styles from "@/styles/post-page.module.css";
 import { LoadingButton } from "@/components/button";
 import { NavBar } from "@/components/navbar";
 import Post from "@/components/post";
-import { RouterOutputs, api } from "@/utils/api";
+import { api } from "@/utils/api";
 import { CircularProgress, TextField, Typography } from "@mui/material";
 import { TRPCClientError } from "@trpc/client";
 import { useRouter } from "next/router";
-import { FormEventHandler, useState } from "react";
+import { type FormEventHandler, useState } from "react";
 import { UserStore } from "@/utils/global-store";
-import { Reply } from "@/components/reply";
-
-type TReply = RouterOutputs["post"]["getReplies"][0];
+import { Reply, type TReply } from "@/components/reply";
 
 export default function PostPage() {
   const router = useRouter();
@@ -72,11 +70,16 @@ function Replies(props: { post_id: string; optimisticReplies: TReply[] }) {
   );
 }
 
-function ReplyBox(props: { post_id: string; optimisticUpdate: (reply: TReply) => void }) {
+export function ReplyBox(props: {
+  post_id: string;
+  parent_id?: string;
+  optimisticUpdate?: (reply: TReply) => void;
+}) {
   const userData = UserStore.get("user");
   const [errorMsg, setErrorMsg] = useState("");
   const replyMut = api.post.reply.useMutation({
     onSuccess: (data) => {
+      if (!props.optimisticUpdate) return;
       props.optimisticUpdate({
         ...data,
         author: userData,
@@ -112,6 +115,7 @@ function ReplyBox(props: { post_id: string; optimisticUpdate: (reply: TReply) =>
     replyMut.mutate({
       content,
       post_id: props.post_id,
+      parent_id: props.parent_id,
     });
 
     e.currentTarget.reset();
