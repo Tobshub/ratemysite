@@ -3,7 +3,8 @@
   "version": "0.1.0",
   "scripts": {
     "build": "next build",
-    "dev": "tdb -db ./db.tdb -log -dbg -port 8085 & next dev | pino-pretty",
+    "dev": "pnpm tdb & next dev | pino-pretty",
+    "tdb": "tdb -db ./db.tdb -log -dbg -port 8085",
     "lint": "next lint",
     "start": "next start"
   },
