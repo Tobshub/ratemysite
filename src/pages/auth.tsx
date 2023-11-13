@@ -1,11 +1,13 @@
 import { LoadingButton, TextButton } from "@/components/button";
-import { TextField, Typography } from "@mui/material";
+import { InputAdornment, TextField, Typography } from "@mui/material";
 import Head from "next/head";
-import { FormEventHandler, useState } from "react";
+import { type FormEventHandler, useState } from "react";
 import styles from "@/styles/auth.module.css";
 import { api } from "@/utils/api";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import HighlightOffIcon from "@mui/icons-material/HighlightOff";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import { ClientToken } from "@/utils/client_token";
 import { type NextRouter, useRouter } from "next/router";
 import { alphaNumericString } from "@/utils/zod";
@@ -39,12 +41,14 @@ function Signup(props: AuthComponentProps) {
       setErrorMsg("");
       ClientToken.set(data.token);
       props.saveUserData({ name: data.name, display_picture: undefined });
-      props.router.push(`/profile/${data.name}?reload=true`);
+      props.router.push(`/profile/${data.name}?reload=true`).catch(null);
     },
     onError: (e) => {
       if (e instanceof TRPCClientError) {
         try {
-          const err: { message: string } = JSON.parse(e.message)[0];
+          const err = (JSON.parse(e.message) as unknown as { message: string }[])[0] as unknown as {
+            message: string;
+          };
           setErrorMsg(err.message);
         } catch {
           setErrorMsg("Something went wrong!");
@@ -74,13 +78,15 @@ function Signup(props: AuthComponentProps) {
     });
   };
 
+  const [showPassword, setShowPassword] = useState(false);
+
   return (
     <>
       <Head>
         <title>Sign Up | RateMySite</title>
       </Head>
       <main className={styles.main}>
-        <div className="rms_logo" onClick={() => props.router.push("/")} />
+        <div className="rms_logo" onClick={() => void props.router.push("/")} />
         <h1>Sign Up</h1>
         <form className={styles.form} onSubmit={submit}>
           <Typography color="red" fontSize={12}>
@@ -136,7 +142,7 @@ function Signup(props: AuthComponentProps) {
             variant="filled"
             label="Password"
             name="password"
-            type="password"
+            type={showPassword ? "text" : "password"}
             value={input.password}
             required
             error={input.password.length ? input.password.length < 8 : false}
@@ -144,6 +150,18 @@ function Signup(props: AuthComponentProps) {
               !!input.password.length && (input.password.length < 8 ? "Password is too short" : "")
             }
             onChange={(e) => setInput((state) => ({ ...state, password: e.target.value }))}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment
+                  position="end"
+                  sx={{ cursor: "pointer" }}
+                  onClick={() => setShowPassword((state) => !state)}
+                  onMouseDown={(e) => e.preventDefault()}
+                >
+                  {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
+                </InputAdornment>
+              ),
+            }}
           />
           <LoadingButton
             type="submit"
@@ -175,7 +193,7 @@ function Login(props: AuthComponentProps) {
       setErrorMsg("");
       ClientToken.set(data.token);
       props.saveUserData({ name: data.name, display_picture: data.display_picture });
-      props.router.push(`/profile/${data.name}?reload=true`);
+      props.router.push(`/profile/${data.name}?reload=true`).catch(null);
     },
     onError: (e) => {
       setErrorMsg(e.message);
@@ -199,20 +217,40 @@ function Login(props: AuthComponentProps) {
     });
   };
 
+  const [showPassword, setShowPassword] = useState(false);
+
   return (
     <>
       <Head>
         <title>Log In | RateMySite</title>
       </Head>
       <main className={styles.main}>
-        <div className="rms_logo" onClick={() => props.router.push("/")} />
+        <div className="rms_logo" onClick={() => void props.router.push("/")} />
         <h1>Log In</h1>
         <form className={styles.form} onSubmit={submit}>
           <Typography color="red" fontSize={12}>
             {errorMsg}
           </Typography>
           <TextField variant="filled" label="Username" name="username" required />
-          <TextField variant="filled" label="Password" name="password" type="password" required />
+          <TextField
+            variant="filled"
+            label="Password"
+            name="password"
+            type={showPassword ? "text" : "password"}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment
+                  position="end"
+                  sx={{ cursor: "pointer" }}
+                  onClick={() => setShowPassword((state) => !state)}
+                  onMouseDown={(e) => e.preventDefault()}
+                >
+                  {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
+                </InputAdornment>
+              ),
+            }}
+            required
+          />
           <LoadingButton
             type="submit"
             isLoading={loginMut.isLoading}
@@ -224,7 +262,8 @@ function Login(props: AuthComponentProps) {
           </LoadingButton>
         </form>
         <p>
-          Don't have an account? <TextButton onClick={props.toggle}>Sign Up.</TextButton>
+          {`Don't have an account? `}
+          <TextButton onClick={props.toggle}>Sign Up.</TextButton>
         </p>
       </main>
     </>
