@@ -1,5 +1,5 @@
-import { Button, CircularProgress, SxProps } from "@mui/material";
-import { PropsWithChildren } from "react";
+import { Button, CircularProgress, type SxProps } from "@mui/material";
+import type { PropsWithChildren } from "react";
 
 interface ButtonProps {
   onClick?: () => void;

@@ -17,7 +17,7 @@ import Dialog from "@mui/material/Dialog";
 import { useRouter } from "next/router";
 import { LoadingButton } from "./button";
 import { api } from "@/utils/api";
-import { ChangeEventHandler, FormEventHandler, useRef, useState } from "react";
+import { type ChangeEvent, type FormEventHandler, useRef, useState } from "react";
 import { Cancel as CancelIcon, ImageSharp } from "@mui/icons-material";
 import type { PostFlags } from "@/server/api/tdb";
 import { PostFlagNames } from "@/components/post";
@@ -39,13 +39,15 @@ export default function CreatePost(props: { open: boolean; close: () => void }) 
   const [pictures, setPictures] = useState<string[]>([]);
   const reader = new FileReader();
   const pictureInputRef = useRef<HTMLInputElement>(null);
+  // TODO: visually track upload progress
+  const [_uploadProgress, setUploadProgess] = useState(0);
+  const [_showProgress, setShowProgress] = useState(false);
 
-  const handlePictureInputChange: ChangeEventHandler<HTMLInputElement> = async (e) => {
-    if (!e.target.files || !e.target.files.length) {
+  const handlePictureInputChange = async (e: ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files?.length) {
       return;
     }
 
-    // TODO: visually track upload progress
     for (const file of e.target.files) {
       reader.readAsDataURL(file);
       await new Promise<void>((res) => {
@@ -56,6 +58,16 @@ export default function CreatePost(props: { open: boolean; close: () => void }) 
           }
           res();
         };
+        reader.onloadstart = () => {
+          setShowProgress(true);
+          setUploadProgess(0);
+        };
+        reader.onprogress = (e) => {
+          const value = Math.round((e.loaded / e.total) * 100);
+          console.log(value + "%");
+          setUploadProgess(value);
+        };
+        reader.onloadend = () => setShowProgress(false);
       });
     }
   };
@@ -82,7 +94,7 @@ export default function CreatePost(props: { open: boolean; close: () => void }) 
   };
 
   if (!ClientToken.get()) {
-    router.push("/auth");
+    router.push("/auth").catch(() => null);
   }
 
   return (
@@ -106,13 +118,13 @@ export default function CreatePost(props: { open: boolean; close: () => void }) 
           label="Flags"
           options={
             [
-              { value: "beginner", name: PostFlagNames["beginner"] },
-              { value: "mobile", name: PostFlagNames["mobile"] },
-              { value: "desktop", name: PostFlagNames["desktop"] },
-              { value: "urgent", name: PostFlagNames["urgent"] },
+              { value: "beginner", name: PostFlagNames.beginner },
+              { value: "mobile", name: PostFlagNames.mobile },
+              { value: "desktop", name: PostFlagNames.desktop },
+              { value: "urgent", name: PostFlagNames.urgent },
               {
                 value: "login_required",
-                name: PostFlagNames["login_required"],
+                name: PostFlagNames.login_required,
               },
             ] as {
               value: PostFlags;
@@ -133,7 +145,7 @@ export default function CreatePost(props: { open: boolean; close: () => void }) 
           <div className={styles.preview_container}>
             {pictures.map((pic, idx) => (
               <div className={styles.preview} key={idx}>
-                <img src={pic} className={styles.preview_img} />
+                <img src={pic} alt="" className={styles.preview_img} />
                 <IconButton
                   className={styles.preview_close}
                   onClick={() => {

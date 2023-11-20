@@ -7,7 +7,7 @@ export default function Feed() {
 
   return (
     <main>
-      {data && data.length ? (
+      {data?.length ? (
         data.map((post) => <Post key={post.reply_id} {...post} />)
       ) : isInitialLoading ? (
         <div style={{ display: "grid", placeItems: "center" }}>

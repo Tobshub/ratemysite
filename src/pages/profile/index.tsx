@@ -15,7 +15,7 @@ export default function ProfileRedirect() {
   // to avoid refetching in actual profile page.
   const profile = api.profile.getWithPostId.useQuery();
 
-  if (profile.data && profile.data.name) {
+  if (profile.data?.name) {
     router.replace(`/profile/${profile.data.name}`);
   }
 

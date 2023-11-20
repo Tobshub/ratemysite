@@ -1,10 +1,10 @@
-import { PropsWithChildren, useState } from "react";
+import { type PropsWithChildren, useState } from "react";
 import styles from "@/styles/navbar.module.css";
 import { PrimaryButton } from "./button";
 import { type NextRouter, useRouter } from "next/router";
 import HomeIcon from "@mui/icons-material/Home";
-import ExploreIcon from "@mui/icons-material/Explore";
-import NotificationsIcon from "@mui/icons-material/Notifications";
+// import ExploreIcon from "@mui/icons-material/Explore";
+// import NotificationsIcon from "@mui/icons-material/Notifications";
 import PersonIcon from "@mui/icons-material/Person";
 import CreateIcon from "@mui/icons-material/Create";
 import {
@@ -51,7 +51,7 @@ function NavRegular(props: NavBarProps) {
         <div
           className="rms_logo"
           style={{ margin: "0 auto" }}
-          onClick={() => props.router.push("/")}
+          onClick={() => void props.router.push("/")}
         />
         <List>
           <NavItem icon={<HomeIcon />} link="/">
@@ -87,7 +87,7 @@ function NavSmall(props: NavBarProps) {
   return (
     <header className={styles.navbar_sm}>
       <nav className={styles.navbar_sm_nav}>
-        <div className="rms_logo" onClick={() => props.router.push("/")} />
+        <div className="rms_logo" onClick={() => void props.router.push("/")} />
         <List
           sx={{
             display: "flex",

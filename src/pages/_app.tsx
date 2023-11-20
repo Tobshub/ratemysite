@@ -23,7 +23,10 @@ const MyApp: AppType = ({ Component, pageProps }) => {
   const url = usePathname();
   useEffect(() => {
     if (searchParams.get("reload")) {
-      router.push(url).then((ok) => (ok ? router.reload() : null));
+      router
+        .push(url)
+        .then((ok) => (ok ? router.reload() : null))
+        .catch(null);
     }
   }, [searchParams, router, url]);
 
