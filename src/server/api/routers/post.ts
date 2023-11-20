@@ -1,10 +1,16 @@
-import { createTRPCRouter, privateProcedure, publicProcedure } from "@/server/api/trpc";
+import {
+  TRPCContext,
+  createTRPCRouter,
+  openProcedure,
+  privateProcedure,
+  publicProcedure,
+} from "@/server/api/trpc";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { PostFlags } from "../tdb";
 
 export const PostRouter = createTRPCRouter({
-  feed: publicProcedure
+  feed: openProcedure
     .input(z.object({ cursor: z.string().nullish() }))
     .query(async ({ input: _, ctx }) => {
       // TODO: use take option (coming soon)
@@ -25,16 +31,8 @@ export const PostRouter = createTRPCRouter({
         });
 
         if (!user.data || user.status !== 200) {
-          // for some reason I don't want to error on 404
-          if (user.status === 404) {
-            ctx.log.error(user, "Could not find post author");
-          } else {
-            ctx.log.error(user, "Error fetching post author");
-            throw new TRPCError({
-              code: "INTERNAL_SERVER_ERROR",
-              message: "Something went wrong!",
-            });
-          }
+          ctx.log.error(user, "Error fetching post author while fetching feed");
+          continue;
         }
 
         posts.push({
@@ -53,48 +51,8 @@ export const PostRouter = createTRPCRouter({
 
       return posts;
     }),
-  get: publicProcedure.input(z.string()).query(async ({ input, ctx }) => {
-    const res = await ctx.db.findUnique("post", { reply_id: input });
-
-    if (res.status !== 200 || !res.data) {
-      if (res.status === 400) {
-        throw new TRPCError({
-          code: "NOT_FOUND",
-          message: "Could not find post",
-        });
-      }
-
-      ctx.log.error(res, "Error fetching post");
-      throw new TRPCError({
-        code: "INTERNAL_SERVER_ERROR",
-        message: "Something went wrong!",
-      });
-    }
-
-    const post_author = await ctx.db.findUnique("user", {
-      post_id: res.data.user_id,
-    });
-
-    if (post_author.status !== 200 || !post_author.data) {
-      ctx.log.error(post_author, "Error fetching post auther");
-      throw new TRPCError({
-        code: "INTERNAL_SERVER_ERROR",
-        message: "Something went wrong!",
-      });
-    }
-
-    return {
-      title: res.data.title,
-      content: res.data.content,
-      flags: res.data.flags,
-      pictures: res.data.pictures,
-      reply_id: res.data.reply_id,
-      created_at: res.data.created_at,
-      author: {
-        name: post_author.data.name,
-        display_picture: post_author.data.display_picture,
-      },
-    };
+  get: openProcedure.input(z.string()).query(async ({ input, ctx }) => {
+    return await GetPost(input, ctx);
   }),
   new: privateProcedure
     .input(
@@ -161,6 +119,9 @@ export const PostRouter = createTRPCRouter({
         created_at: res.data.created_at,
       };
     }),
+  getReply: publicProcedure.input(z.string()).query(async ({ input, ctx }) => {
+    return await GetReply(input, ctx);
+  }),
   reply: privateProcedure
     .input(
       z.object({
@@ -226,15 +187,8 @@ export const PostRouter = createTRPCRouter({
         });
 
         if (!author.data || author.status !== 200) {
-          if (author.status === 404) {
-            ctx.log.error(author, "Could not find reply author");
-          } else {
-            ctx.log.error(author, "Error fetching reply author");
-            throw new TRPCError({
-              code: "INTERNAL_SERVER_ERROR",
-              message: "Something went wrong!",
-            });
-          }
+          ctx.log.error(author, "Error fetching reply author");
+          continue;
         }
 
         replies.push({
@@ -337,7 +291,96 @@ export const PostRouter = createTRPCRouter({
         down_votes: res.data.down_voters.length,
       };
     }),
+  // TODO: create new api endpoint for getting parent
+  // which could be post or reply
+  getParent: publicProcedure
+    .input(z.object({ post_id: z.string().optional(), parent_id: z.string().optional() }))
+    .query(async ({ input, ctx }) => {
+      if (input.parent_id) {
+        return await GetReply(input.parent_id, ctx);
+      }
+      if (input.post_id) {
+        return await GetPost(input.post_id, ctx);
+      }
+      return null;
+    }),
 });
+
+async function GetPost(reply_id: string, ctx: TRPCContext) {
+  const res = await ctx.db.findUnique("post", { reply_id });
+
+  if (res.status !== 200 || !res.data) {
+    if (res.status === 400) {
+      throw new TRPCError({ code: "NOT_FOUND", message: "Could not find post" });
+    }
+
+    ctx.log.error(res, "Error fetching post");
+    throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Something went wrong!" });
+  }
+
+  const post_author = await ctx.db.findUnique("user", { post_id: res.data.user_id });
+
+  if (post_author.status !== 200 || !post_author.data) {
+    ctx.log.error(post_author, "Error fetching post auther");
+    throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Something went wrong!" });
+  }
+
+  return {
+    title: res.data.title,
+    content: res.data.content,
+    flags: res.data.flags,
+    pictures: res.data.pictures,
+    reply_id: res.data.reply_id,
+    created_at: res.data.created_at,
+    author: {
+      name: post_author.data.name,
+      display_picture: post_author.data.display_picture,
+    },
+  };
+}
+
+async function GetReply(reply_id: string, ctx: TRPCContext & { auth: { post_id: string } }) {
+  const res = await ctx.db.findUnique("reply", { reply_id });
+
+  if (res.status !== 200 || !res.data) {
+    if (res.status === 400) {
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message: "Could not find reply",
+      });
+    }
+    ctx.log.error(res, "Error fetching reply");
+    throw new TRPCError({
+      code: "INTERNAL_SERVER_ERROR",
+      message: "Something went wrong!",
+    });
+  }
+
+  const reply_author = await ctx.db.findUnique("user", { post_id: res.data.user_id });
+
+  if (reply_author.status !== 200 || !reply_author.data) {
+    ctx.log.error(reply_author, "Error fetching reply author");
+    throw new TRPCError({
+      code: "INTERNAL_SERVER_ERROR",
+      message: "Something went wrong!",
+    });
+  }
+
+  return {
+    content: res.data.content,
+    post_id: res.data.post_id,
+    parent_id: res.data.parent_id,
+    reply_id: res.data.reply_id,
+    created_at: res.data.created_at,
+    author: {
+      name: reply_author.data.name,
+      display_picture: reply_author.data.display_picture,
+    },
+    up_votes: res.data.up_voters.length,
+    down_votes: res.data.down_voters.length,
+    user_vote: GetUserVote(ctx.auth.post_id, res.data.up_voters, res.data.down_voters),
+  };
+}
 
 /** 1 for upvote, -1 for downvote, 0 for no vote */
 function GetUserVote(post_id: string, up_voters: string[], down_voters: string[]) {
