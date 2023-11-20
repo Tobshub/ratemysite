@@ -50,11 +50,9 @@ type DB = {
   };
 };
 
-export const db = await Tobsdb.connect<DB>(
-  env.TDB_HOST,
-  env.TDB_DB_NAME,
-  { auth: { username: env.TDB_USERNAME, password: env.TDB_PASSWORD } },
-  { log: env.NODE_ENV === "development" }
-);
-
-process.prependOnceListener("SIGINT", () => db.disconnect());
+export const db = new Tobsdb<DB>(env.TDB_HOST, env.TDB_DB_NAME, {
+  username: env.TDB_USERNAME,
+  password: env.TDB_PASSWORD,
+  log: env.NODE_ENV === "development",
+});
+await db.connect();
