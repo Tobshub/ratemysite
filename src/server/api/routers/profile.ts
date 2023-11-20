@@ -4,11 +4,18 @@ import { z } from "zod";
 import { Encrypt } from "../auth";
 
 export const ProfileRouter = createTRPCRouter({
-  getWithPostId: privateProcedure.query(async ({ ctx }) => {
+  getWithPostId: publicProcedure.query(async ({ ctx }) => {
+    if (!ctx.auth.token || !ctx.auth.post_id) {
+      throw new TRPCError({
+        code: "PRECONDITION_FAILED",
+        message: "Please Login or Sign Up",
+      });
+    }
+
     const user = await ctx.db.findUnique("user", { post_id: ctx.auth.post_id });
 
     if (!user.data || user.status !== 200) {
-      if (user.status === 400) {
+      if (user.status === 404) {
         throw new TRPCError({
           code: "NOT_FOUND",
           message: "User profile not found",
