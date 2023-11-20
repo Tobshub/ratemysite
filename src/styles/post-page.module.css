@@ -9,6 +9,15 @@
     padding: 0.5rem 0.4rem;
     border-radius: 6px;
 
+    .reply_author * {
+      font-size: 16px;
+    }
+
+    .reply_author svg {
+      width: 20px;
+      height: 20px;
+    }
+
     .reply_actions {
       margin-left: auto;
       width: fit-content;

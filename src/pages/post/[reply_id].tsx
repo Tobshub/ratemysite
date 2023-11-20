@@ -40,7 +40,7 @@ export default function PostPage() {
     <div className="page">
       <NavBar />
       <main>
-        <Post {...post.data} large />
+        <Post {...post.data} size="large" />
         <ReplyBox
           post_id={reply_id}
           optimisticUpdate={(reply) => setOptimisticReplies((state) => [reply, ...state])}
@@ -53,8 +53,18 @@ export default function PostPage() {
   );
 }
 
-function Replies(props: { post_id: string; optimisticReplies: TReply[] }) {
-  const replies = api.post.getReplies.useQuery({ post_id: props.post_id });
+export function Replies(props: {
+  post_id: string;
+  parent_id?: string;
+  optimisticReplies: TReply[];
+}) {
+  const replies = api.post.getReplies.useQuery(
+    {
+      post_id: props.post_id,
+      parent_id: props.parent_id,
+    },
+    { refetchOnMount: true }
+  );
   const router = useRouter();
   return (
     <div className={styles.replies_container}>

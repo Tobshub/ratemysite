@@ -11,7 +11,6 @@ import { ReplyBox } from "@/pages/post/[reply_id]";
 
 export type TReply = RouterOutputs["post"]["getReplies"][0];
 
-// TODO: route to reply page on click
 export function Reply(props: TReply & { router: NextRouter }) {
   const { userVote, toggleUpVote, toggleDownVote } = useVote({
     reply_id: props.reply_id,
@@ -21,10 +20,14 @@ export function Reply(props: TReply & { router: NextRouter }) {
   const [replyDialogOpen, setReplyDialogOpen] = useState(false);
 
   return (
-    <div className={styles.reply}>
-      <PostAuthor {...props.author} fontSize={20} />
+    <div
+      className={styles.reply}
+      style={{ cursor: "pointer" }}
+      onClick={() => void props.router.push(`/post/reply/${props.reply_id}`)}
+    >
+      <PostAuthor {...props.author} className={styles.reply_author} />
       <p style={{ whiteSpace: "pre-line" }}>{props.content}</p>
-      <div className={styles.reply_actions}>
+      <div className={styles.reply_actions} onClick={(e) => e.stopPropagation()}>
         <IconButton title="upvote" onClick={toggleUpVote}>
           <HandshakeIcon color={userVote > 0 ? "success" : undefined} fontSize="small" />
         </IconButton>
@@ -34,10 +37,14 @@ export function Reply(props: TReply & { router: NextRouter }) {
         <IconButton title="reply" onClick={() => setReplyDialogOpen(true)}>
           <ReplyIcon fontSize="small" />
         </IconButton>
+        {replyDialogOpen ? (
+          <ReplyDialog
+            open={replyDialogOpen}
+            close={() => setReplyDialogOpen(false)}
+            data={props}
+          />
+        ) : null}
       </div>
-      {replyDialogOpen ? (
-        <ReplyDialog open={replyDialogOpen} close={() => setReplyDialogOpen(false)} data={props} />
-      ) : null}
     </div>
   );
 }
@@ -89,17 +96,10 @@ function useVote(props: { reply_id: string; user_vote: number }) {
   const voteMut = api.post.voteOnReply.useMutation();
 
   useEffect(() => {
-    if (props.reply_id) {
-      voteMut.mutate({
-        reply_id: props.reply_id,
-        userVote: userVote,
-      });
+    if (props.reply_id && userVote !== props.user_vote) {
+      voteMut.mutate({ reply_id: props.reply_id, userVote: userVote });
     }
   }, [userVote]);
 
-  return {
-    userVote,
-    toggleUpVote,
-    toggleDownVote,
-  };
+  return { userVote, toggleUpVote, toggleDownVote };
 }

@@ -15,20 +15,35 @@ export const PostFlagNames: Record<PostFlags, string> = {
   urgent: "Urgent",
 };
 
-export default function Post(props: RouterOutputs["post"]["feed"][0] & { large?: boolean }) {
+export default function Post(
+  props: (RouterOutputs["post"]["get"] | RouterOutputs["post"]["getReply"]) & {
+    size?: "small" | "normal" | "large";
+    title: string;
+    noLink?: boolean;
+    isReply?: boolean;
+  }
+) {
   const router = useRouter();
 
   return (
     <div
-      className={props.large ? styles.post_large : styles.post}
-      onClick={() => router.push(`/post/${props.reply_id}`)}
-      style={props.large ? {} : { cursor: "pointer" }}
+      className={styles[props.size ?? "normal"]}
+      onClick={
+        props.noLink
+          ? undefined
+          : () => {
+              router.push(
+                props.isReply ? `/post/reply/${props.reply_id}` : `/post/${props.reply_id}`
+              );
+            }
+      }
+      style={props.size === "large" ? {} : { cursor: "pointer" }}
     >
-      <PostAuthor {...props.author} fontSize={props.large ? 28 : undefined} />
-      {props.flags && props.flags.length ? <PostFlags flags={props.flags} /> : null}
+      <PostAuthor {...props.author} className={styles.post_author} />
+      {"flags" in props && props.flags?.length ? <PostFlagsComponent flags={props.flags} /> : null}
       <h2>{props.title}</h2>
       <p style={{ whiteSpace: "pre-line" }}>{props.content}</p>
-      {props.pictures && props.pictures.length ? (
+      {"pictures" in props && props.pictures?.length ? (
         <div className={styles.post_pic_container} onClick={(e) => e.stopPropagation()}>
           {props.pictures.map((pic, idx) => (
             <PostImage src={pic} key={idx} />
@@ -57,7 +72,7 @@ function PostImage(props: { src: string }) {
       <img className={styles.post_pic} loading="lazy" src={src} onClick={() => setIsOpen(true)} />
       {isOpen ? (
         <Dialog open={isOpen} onClose={() => setIsOpen(false)}>
-          <img className={styles.open_post_pic} src={src} />
+          <img className={styles.open_post_pic} alt="" src={src} />
         </Dialog>
       ) : null}
     </>
@@ -65,10 +80,10 @@ function PostImage(props: { src: string }) {
 }
 
 // TODO: probably gonna add some sort of post search with flags
-function PostFlags(props: { flags: PostFlags[] }) {
+function PostFlagsComponent(props: { flags: PostFlags[] }) {
   return (
     <div
-      style={{ display: "flex", gap: ".2rem", flexWrap: "wrap" }}
+      style={{ display: "flex", gap: ".2rem", flexWrap: "wrap", cursor: "pointer" }}
       onClick={(e) => /* prevent opening post */ e.stopPropagation()}
     >
       {props.flags.map((flag, idx) => (
@@ -82,11 +97,13 @@ export function PostAuthor(props: {
   name: string;
   display_picture: string | undefined;
   fontSize?: number;
+  className?: string;
 }) {
   return (
     <div
       style={{ width: "fit-content" }}
       onClick={(e) => /* prevent opening post */ e.stopPropagation()}
+      className={props.className}
     >
       <Link
         href={`/profile/${props.name}`}
@@ -100,18 +117,15 @@ export function PostAuthor(props: {
         }}
       >
         {props.display_picture ? (
-          <img src={props.display_picture} className={styles.display_picture} />
+          <img src={props.display_picture} alt="" className={styles.display_picture} />
         ) : (
           <Avatar
-            size={props.fontSize ?? 24}
             name={props.name}
             variant="beam"
             colors={["#92A1C6", "#146A7C", "#F0AB3D", "#C271B4", "#C20D90"]}
           />
         )}
-        <Typography sx={{ "&:hover": { fontWeight: "500" }, fontSize: props.fontSize }}>
-          {props.name}
-        </Typography>
+        <Typography sx={{ "&:hover": { fontWeight: "500" } }}>{props.name}</Typography>
       </Link>
     </div>
   );
