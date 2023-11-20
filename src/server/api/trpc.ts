@@ -43,6 +43,8 @@ export const createTRPCContext = (_opts: CreateNextContextOptions) => {
   });
 };
 
+export type TRPCContext = ReturnType<typeof createTRPCContext>;
+
 /**
  * 2. INITIALIZATION
  *
@@ -78,6 +80,15 @@ const t = initTRPC.context<typeof createTRPCContext>().create({
  */
 export const createTRPCRouter = t.router;
 
+/**
+ * Public (unauthenticated) procedure
+ *
+ * This is the base piece you use to build new queries and mutations on your tRPC API. It does not
+ * guarantee that a user querying is authorized, but you can still access user session data if they
+ * are logged in.
+ */
+export const openProcedure = t.procedure;
+
 const optionalAuth = t.middleware(({ next, ctx }) => {
   if (ctx.auth.token) {
     try {
@@ -89,13 +100,7 @@ const optionalAuth = t.middleware(({ next, ctx }) => {
   }
   return next({ ctx: { auth: { ...ctx.auth } } });
 });
-/**
- * Public (unauthenticated) procedure
- *
- * This is the base piece you use to build new queries and mutations on your tRPC API. It does not
- * guarantee that a user querying is authorized, but you can still access user session data if they
- * are logged in.
- */
+
 export const publicProcedure = t.procedure.use(optionalAuth);
 
 const isAuthed = t.middleware(({ next, ctx }) => {
