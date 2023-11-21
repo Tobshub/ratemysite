@@ -1,10 +1,15 @@
 import styles from "@/styles/profile.module.css";
-import { NavBar } from "@/components/navbar";
 import { RouterOutputs, api } from "@/utils/api";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import Avatar from "boring-avatars";
 import Post from "@/components/post";
+import { NavbarLayout } from "@/layouts/navbar";
+import type { ReactElement } from "react";
+
+ProfilePage.getLayout = function (page: ReactElement) {
+  return <NavbarLayout>{page}</NavbarLayout>;
+};
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -15,16 +20,13 @@ export default function ProfilePage() {
   return (
     <>
       <Head>
-        <title>{title} on RateMySite | RateMySite</title>
+        <title>{title} on RateMySite</title>
       </Head>
-      <div className="page">
-        <NavBar />
-        {profile.data ? (
-          <Profile {...profile.data} />
-        ) : profile.isInitialLoading ? null : (
-          "Profile does not exists"
-        )}
-      </div>
+      {profile.data ? (
+        <Profile {...profile.data} />
+      ) : profile.isInitialLoading ? null : (
+        "Profile does not exists"
+      )}
     </>
   );
 }
@@ -60,6 +62,7 @@ function Profile(props: RouterOutputs["profile"]["get"]) {
         <div className={styles.posts}>
           {props.posts.map((post) => (
             <Post
+              size="normal"
               key={post.reply_id}
               {...post}
               author={{

@@ -1,17 +1,11 @@
 import Feed from "@/components/feed";
-import { NavBar } from "@/components/navbar";
-import Head from "next/head";
+import { NavbarLayout } from "@/layouts/navbar";
+import type { ReactElement } from "react";
 
 export default function Home() {
-  return (
-    <>
-      <Head>
-        <title>RateMySite</title>
-      </Head>
-      <div className="page">
-        <NavBar />
-        <Feed />
-      </div>
-    </>
-  );
+  return <Feed />;
 }
+
+Home.getLayout = function (page: ReactElement) {
+  return <NavbarLayout title="RateMySite">{page}</NavbarLayout>;
+};

@@ -1,11 +1,16 @@
-import { NavBar } from "@/components/navbar";
 import Post from "@/components/post";
 import { Replies, ReplyBox } from "../[reply_id]";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { type ReactElement, useEffect, useState } from "react";
 import { type TReply } from "@/components/reply";
 import { api } from "@/utils/api";
 import CircularProgress from "@mui/material/CircularProgress";
+import { NavbarLayout } from "@/layouts/navbar";
+import Head from "next/head";
+
+ReplyPage.getLayout = function (page: ReactElement) {
+  return <NavbarLayout>{page}</NavbarLayout>;
+};
 
 export default function ReplyPage() {
   const router = useRouter();
@@ -38,17 +43,14 @@ export default function ReplyPage() {
 
   // TODO: work on not found component
   if (!reply.data) {
-    return (
-      <div className="page">
-        <NavBar />
-        <main>Not Found...</main>
-      </div>
-    );
+    return <main>Not Found...</main>;
   }
 
   return (
-    <div className="page">
-      <NavBar />
+    <>
+      <Head>
+        <title>{`Reply from ${reply.data.author.name}`}</title>
+      </Head>
       <main>
         {parent.data ? (
           <Post title="Reply" {...parent.data} isReply={!!reply.data?.parent_id} size="small" />
@@ -67,6 +69,6 @@ export default function ReplyPage() {
           />
         ) : null}
       </main>
-    </div>
+    </>
   );
 }

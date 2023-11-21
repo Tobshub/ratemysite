@@ -1,4 +1,4 @@
-import { type AppType } from "next/app";
+import { type AppProps, type AppType } from "next/app";
 
 import { api } from "@/utils/api";
 import { createTheme, ThemeProvider } from "@mui/material";
@@ -10,13 +10,18 @@ import "@fontsource/roboto/700.css";
 
 import "@/styles/globals.css";
 import { PopulateUserStore } from "@/utils/populate-store";
-import { useEffect } from "react";
+import { type ReactElement, type ReactNode, useEffect } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useRouter } from "next/router";
+import type { NextPage } from "next";
 
 const theme = createTheme({ palette: { mode: "dark" } });
 
-const MyApp: AppType = ({ Component, pageProps }) => {
+export type NextPageWithLayout<P = {}, IP = P> = NextPage<P, IP> & {
+  getLayout?: (page: ReactElement) => ReactNode;
+};
+
+const MyApp: AppType = ({ Component, pageProps }: AppProps & { Component: NextPageWithLayout }) => {
   PopulateUserStore();
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -30,11 +35,9 @@ const MyApp: AppType = ({ Component, pageProps }) => {
     }
   }, [searchParams, router, url]);
 
-  return (
-    <ThemeProvider theme={theme}>
-      <Component {...pageProps} />
-    </ThemeProvider>
-  );
+  const getLayout = Component.getLayout ?? ((page) => page);
+
+  return <ThemeProvider theme={theme}>{getLayout(<Component {...pageProps} />)}</ThemeProvider>;
 };
 
 export default api.withTRPC(MyApp);

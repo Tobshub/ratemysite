@@ -1,8 +1,13 @@
+import { NavbarLayout } from "@/layouts/navbar";
 import { api } from "@/utils/api";
 import { ClientToken } from "@/utils/client_token";
 import { CircularProgress, Typography } from "@mui/material";
-import Head from "next/head";
 import { useRouter } from "next/router";
+import type { ReactElement } from "react";
+
+ProfileRedirect.getLayout = function (page: ReactElement) {
+  return <NavbarLayout title="Profile | RateMySite">{page}</NavbarLayout>;
+};
 
 export default function ProfileRedirect() {
   const router = useRouter();
@@ -20,17 +25,12 @@ export default function ProfileRedirect() {
   }
 
   return (
-    <>
-      <Head>
-        <title>Profile | RateMySite</title>
-      </Head>
-      <div style={{ display: "flex", justifyContent: "center" }}>
-        {profile.isLoading ? (
-          <CircularProgress />
-        ) : profile.isError ? (
-          <Typography color="red">{profile.error?.message}</Typography>
-        ) : null}
-      </div>
-    </>
+    <main style={{ display: "flex", justifyContent: "center" }}>
+      {profile.isLoading ? (
+        <CircularProgress />
+      ) : profile.isError ? (
+        <Typography color="red">{profile.error?.message}</Typography>
+      ) : null}
+    </main>
   );
 }

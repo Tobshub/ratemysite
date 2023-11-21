@@ -1,14 +1,19 @@
 import styles from "@/styles/post-page.module.css";
 import { LoadingButton } from "@/components/button";
-import { NavBar } from "@/components/navbar";
 import Post from "@/components/post";
 import { api } from "@/utils/api";
 import { CircularProgress, TextField, Typography } from "@mui/material";
 import { TRPCClientError } from "@trpc/client";
 import { useRouter } from "next/router";
-import { type FormEventHandler, useState } from "react";
+import { type FormEventHandler, useState, type ReactElement } from "react";
 import { UserStore } from "@/utils/global-store";
 import { Reply, type TReply } from "@/components/reply";
+import { NavbarLayout } from "@/layouts/navbar";
+import Head from "next/head";
+
+PostPage.getLayout = function (page: ReactElement) {
+  return <NavbarLayout>{page}</NavbarLayout>;
+};
 
 export default function PostPage() {
   const router = useRouter();
@@ -29,16 +34,23 @@ export default function PostPage() {
   // TODO: work on not found component
   if (!post.data) {
     return (
-      <div className="page">
-        <NavBar />
+      <>
+        <Head>
+          <title>Not Found | RateMySite</title>
+        </Head>
         <main>Not Found...</main>
-      </div>
+      </>
     );
   }
 
   return (
-    <div className="page">
-      <NavBar />
+    <>
+      <Head>
+        <title>
+          {post.data.title.length ? post.data.title : `Post from ${post.data.author.name}`} |
+          RateMySite
+        </title>
+      </Head>
       <main>
         <Post {...post.data} size="large" />
         <ReplyBox
@@ -49,7 +61,7 @@ export default function PostPage() {
           <Replies post_id={reply_id} optimisticReplies={optimisticReplies} />
         ) : null}
       </main>
-    </div>
+    </>
   );
 }
 
@@ -65,7 +77,16 @@ export function Replies(props: {
     },
     { refetchOnMount: true }
   );
+
   const router = useRouter();
+
+  if (replies.isInitialLoading) {
+    return (
+      <div className={styles.reply_container} style={{ justifyContent: "center" }}>
+        <CircularProgress />
+      </div>
+    );
+  }
   return (
     <div className={styles.replies_container}>
       {props.optimisticReplies.length
